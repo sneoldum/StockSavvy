@@ -4,17 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>066139ea-5db2-427c-ac68-9ce29f46e2dd</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Controllers\**" />
-    <Compile Remove="Models\**" />
     <Content Remove="Controllers\**" />
-    <Content Remove="Models\**" />
     <EmbeddedResource Remove="Controllers\**" />
-    <EmbeddedResource Remove="Models\**" />
     <None Remove="Controllers\**" />
-    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>

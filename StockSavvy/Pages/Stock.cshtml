@@ -1,0 +1,51 @@
+﻿@page
+@model StockSavvy.Pages.StockModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+
+<div class="container">
+    <div>
+        <form asp-page-handler="StockRequest" method="post">
+            <input style="width: 44%;" type="search" placeholder="Type stock code (eg. AMZN)" asp-for="StockCode" />
+            <input style="width: 45%;" type="search" placeholder="Enter your Alpha Vantage Api key" asp-for="key" />
+            <button style="width: 10%;" class="btn btn-outline-primary">Search</button>
+        </form>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Stock Code</th>
+                    <th scope="col">Stock Name</th>
+                    <th scope="col">Open</th>
+                    <th scope="col">Close</th>
+                    <th scope="col">Volume</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+                @if (Model.DataList != null)
+                {
+                    int i = 1;
+                    @foreach (var data in Model.DataList)
+                    {
+                        
+                        <tr>
+                            <th scope="row">@i</th>
+                            <td>@Model.DataSymbol</td>
+                            <td>@Model.Date[i-1]</td>
+                            <td>@data.Open</td>
+                            <td>@data.Close</td>
+                            <td>@data.Volume</td>
+
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
