@@ -17,4 +17,8 @@
     <None Remove="Models\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Binance.Net" Version="8.6.1" />
+  </ItemGroup>
+
 </Project>

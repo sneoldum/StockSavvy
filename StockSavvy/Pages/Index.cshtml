@@ -5,6 +5,52 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Binance</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>LastPrice</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody id="tickerTableBody">
+                    @foreach (var ticker in Model.tickers)
+                    {
+                        var Volume = Math.Round(ticker.Volume * ticker.LastPrice);
+                        <tr>
+                            <td>@ticker.Symbol</td>
+                            <td>@ticker.LastPrice</td>
+                            <td>@Volume</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+<script>
+    function refreshData() {
+        $.ajax({
+            url: '/Index',
+            type: 'GET',
+            success: function (data) {
+                var tableBody = $('#tickerTableBody');
+                tableBody.empty();
+
+                data.tickers.forEach(function (ticker) {
+                    var volume = Math.round(ticker.Volume * ticker.LastPrice);
+                    var row = $('<tr>');
+                    row.append($('<td>').text(ticker.Symbol));
+                    row.append($('<td>').text(ticker.LastPrice));
+                    row.append($('<td>').text(Volume));
+                    tableBody.append(row);
+                });
+            }
+        });
+    }
+
+    setInterval(refreshData, 1000);
+</script>
