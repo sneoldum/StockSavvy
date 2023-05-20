@@ -24,7 +24,7 @@ namespace StockSavvy.Services
 
             var json = new WebClient().DownloadString(url);
             StockModel? stockData = JsonSerializer.Deserialize<StockModel>(json);
-            
+            stockData.json = json;
             Console.WriteLine(stockData.Datas);
             return stockData;
 

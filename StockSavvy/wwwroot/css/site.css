@@ -16,3 +16,12 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+
+#line-example-12 {
+    height: 200px;
+    font-size: 5px;
+    margin: 0 auto;
+    background-color: #f6f6f6;
+}
