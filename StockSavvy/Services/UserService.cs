@@ -12,7 +12,9 @@ public class UserService
     {
         var client =
             new MongoClient(
-                "mongodb+srv://admin:hQSH0VkQDAmU9gT2@mongocluster.uqjdact.mongodb.net/?retryWrites=true&w=majority");
+                //"mongodb+srv://admin:hQSH0VkQDAmU9gT2@mongocluster.uqjdact.mongodb.net/?retryWrites=true&w=majority");
+        "mongodb+srv://admin:hQSH0VkQDAmU9gT2@mongocluster.uqjdact.mongodb.net/stocksavvy?connect=replicaSet");
+
         var database = client.GetDatabase("stocksavvy");
         userCollection = database.GetCollection<UserMongoModel>("User");
     }
