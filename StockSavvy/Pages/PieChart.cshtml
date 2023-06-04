@@ -1,0 +1,177 @@
+@page
+@model StockSavvy.Pages.PieChart
+
+<style>
+  .chart-label {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    text-anchor: middle;
+    fill: #333;
+    pointer-events: none;
+  }
+
+  .chart-value {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    text-anchor: middle;
+    fill: #333;
+    pointer-events: none;
+  }
+</style>
+
+<div id="chart"></div>
+
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script>
+  // set the dimensions and margins of the graph
+  var width = 600
+  height = 2 * width / 3
+  margin = 40
+
+  // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+  var radius = Math.min(width, height) / 2 - margin
+
+  // append the svg object to the div called 'my_dataviz'
+  var svg = d3.select("#chart")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+  // Create dummy data
+  var data = { APPL: 9, TSLA: 20, IBM: 30, MSFT: 8, A: 20, B: 30, C: 8, D: 20, Q: 30, W: 8, E: 20, R: 30, T: 8 }
+
+  // set the color scale
+  var color = d3.scaleOrdinal()
+    .range(d3.schemeDark2);
+
+  // Compute the position of each group on the pie:
+  var pie = d3.pie()
+    .sort(null) // Do not sort group by size
+    .value(function (d) { return d.value; })
+  var data_ready = pie(d3.entries(data))
+
+  // The arc generator
+  var arc = d3.arc()
+    .innerRadius(radius * 0.5)         // This is the size of the donut hole
+    .outerRadius(radius * 0.8)
+
+  // Another arc that won't be drawn. Just for labels positioning
+  var outerArc = d3.arc()
+    .innerRadius(radius * 0.9)
+    .outerRadius(radius * 0.9)
+
+  // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+  // Function to increase the size of an element with animation
+  function enlargeElement(element) {
+    element
+      .transition()
+      .duration(200)
+      .attr("transform", "scale(1.2)");
+  }
+
+  // Function to reset the size of an element with animation
+  function resetElementSize(element) {
+    element
+      .transition()
+      .duration(200)
+      .attr("transform", "scale(1)");
+  }
+
+  // Function to hide non-cursor labels and polylines
+  function hideNonCursorElements(data) {
+    svg
+      .selectAll('.allPolylines')
+      .transition()
+      .duration(200)
+      .style("opacity", function (d) {
+        return (d === data ? 1 : 0);
+      });
+
+    svg
+      .selectAll('.allLabels')
+      .transition()
+      .duration(200)
+      .style("opacity", function (d) {
+        return (d === data ? 1 : 0);
+      });
+  }
+
+  // Function to show all labels and polylines
+  function showAllElements() {
+    svg
+      .selectAll('.allPolylines')
+      .transition()
+      .duration(200)
+      .style("opacity", 1);
+
+    svg
+      .selectAll('.allLabels')
+      .transition()
+      .duration(200)
+      .style("opacity", 1);
+  }
+
+  // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+  var piePaths = svg
+    .selectAll('allSlices')
+    .data(data_ready)
+    .enter()
+    .append('path')
+    .attr('d', arc)
+    .attr('fill', function (d) { return (color(d.data.key)) })
+    .attr("stroke", "white")
+    .style("stroke-width", "2px")
+    .style("opacity", 0.7)
+    .on("mouseover", function (d) {
+      enlargeElement(d3.select(this));
+      hideNonCursorElements(d);
+    })
+    .on("mouseout", function () {
+      resetElementSize(d3.select(this));
+      showAllElements();
+    });
+
+  // Add the polylines between chart and labels:
+  svg
+    .selectAll('allPolylines')
+    .data(data_ready)
+    .enter()
+    .append('polyline')
+    .attr("class", "allPolylines")
+    .attr("stroke", "black")
+    .style("fill", "none")
+    .attr("stroke-width", 1)
+    .attr('points', function (d) {
+      var posA = arc.centroid(d);
+      var posB = outerArc.centroid(d);
+      var posC = outerArc.centroid(d);
+      var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+      posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1);
+      return [posA, posB, posC];
+    });
+
+  // Add the labels:
+  svg
+    .selectAll('allLabels')
+    .data(data_ready)
+    .enter()
+    .append('text')
+    .attr("class", function (d) { return "allLabels label-" + d.data.key; })
+    .text(function (d) {
+      return d.data.key + " (" + Math.round((d.data.value / d3.sum(data_ready, function (d) { return d.data.value; })) * 100) + "%)";
+    })
+    .attr('transform', function (d) {
+      var pos = outerArc.centroid(d);
+      var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+      pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+      return 'translate(' + pos + ')';
+    })
+    .style('text-anchor', function (d) {
+      var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+      return (midangle < Math.PI ? 'start' : 'end');
+    });
+
+</script>
