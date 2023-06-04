@@ -26,21 +26,21 @@ public class UserService
     //returns user by unique username
     public UserMongoModel GetOneByUsername(String username)
     {
-        return userCollection.Find(model => model.Username == username).First();
+        return userCollection.Find(model => model.Username == username).FirstOrDefault();
     }
 
     //creates a user from scratch, Id field must be null in order to create new one otherwise it will try to update an existing one
-    public UserMongoModel Create(UserMongoModel userMongoModel)
+    public string Create(UserMongoModel userMongoModel)
     {
         userCollection.InsertOne(userMongoModel);
-        return userMongoModel;
+        return userMongoModel.Id.ToString();
     }
 
     //updates a user, usermongomodel has to contain a valid user id
-    public UserMongoModel Update(UserMongoModel userMongoModel)
+    public string Update(UserMongoModel userMongoModel)
     {
         userCollection.ReplaceOne(model => model.Id == userMongoModel.Id, userMongoModel);
-        return userMongoModel;
+        return userMongoModel.Id.ToString();
     }
     
     //deletes user by its id

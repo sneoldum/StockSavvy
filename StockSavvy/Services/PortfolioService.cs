@@ -23,21 +23,21 @@ public class PortfolioService
     //returns portfolio by unique id
     public PortfolioMongoModel GetOneByUserId(ObjectId userId)
     {
-        return PortfolioCollection.Find(model => model.UserId == userId).First();
+        return PortfolioCollection.Find(model => model.UserId == userId).FirstOrDefault();
     }
 
     //creates a portfolio from scratch, Id field must be null in order to create new one otherwise it will try to update an existing one
-    public PortfolioMongoModel Create(PortfolioMongoModel portfolioMongoModel)
+    public string Create(PortfolioMongoModel portfolioMongoModel)
     {
         PortfolioCollection.InsertOne(portfolioMongoModel);
-        return portfolioMongoModel;
+        return portfolioMongoModel.Id.ToString();
     }
 
     //updates a portfolio, portfoliomongomodel has to contain a valid portfolio id
-    public PortfolioMongoModel Update(PortfolioMongoModel portfolioMongoModel)
+    public string Update(PortfolioMongoModel portfolioMongoModel)
     {
         PortfolioCollection.ReplaceOne(model => model.Id == portfolioMongoModel.Id, portfolioMongoModel);
-        return portfolioMongoModel;
+        return portfolioMongoModel.Id.ToString();
     }
 
     //deletes by id

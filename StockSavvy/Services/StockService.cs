@@ -49,21 +49,21 @@ namespace StockSavvy.Services
         //returns user by unique id
         public StockMongoModel GetOneById(ObjectId objectId)
         {
-            return StockCollection.Find(model => model.Id == objectId).First();
+            return StockCollection.Find(model => model.Id == objectId).FirstOrDefault();
         }
 
         //creates a stock from scratch, Id field must be null in order to create new one otherwise it will try to update an existing one
-        public StockMongoModel Create(StockMongoModel stockMongoModel)
+        public string Create(StockMongoModel stockMongoModel)
         {
             StockCollection.InsertOne(stockMongoModel);
-            return stockMongoModel;
+            return stockMongoModel.Id.ToString();
         }
 
         //updates a stock, stockmongomodel has to contain a valid stock id
-        public StockMongoModel Update(StockMongoModel stockMongoModel)
+        public string Update(StockMongoModel stockMongoModel)
         {
             StockCollection.ReplaceOne(model => model.Id == stockMongoModel.Id, stockMongoModel);
-            return stockMongoModel;
+            return stockMongoModel.Id.ToString();
         }
 
         //deletes user by its id
