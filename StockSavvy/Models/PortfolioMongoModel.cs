@@ -18,7 +18,12 @@ public class PortfolioMongoModel
     public bool Status { get; set; }
     
     [BsonElement("Stocks")]
-    [BsonRepresentation(BsonType.Array)]
+    //[BsonRepresentation(BsonType.Array)]
     //this list contaions id of stocks that part of this particular portfolio
     public List<string> Stocks { get; set; }
+
+    public PortfolioMongoModel()
+    {
+        Stocks = new List<string>();
+    }
 }
