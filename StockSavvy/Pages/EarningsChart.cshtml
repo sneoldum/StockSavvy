@@ -1,0 +1,54 @@
+@page
+@model StockSavvy.Pages.PieChart
+
+<div id="chartContainer">
+    <canvas id="chart"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+        // Sample data for stock earnings
+        const earningsData = [150, -50, 200, -150, 300, 50, -100, 250, 150, -200];
+        const stockNames = ['Total Earnings', 'AAPL', 'GOOG', 'MSFT', 'AMZN', 'FB', 'TSLA', 'NVDA', 'PYPL', 'NFLX', 'ADBE'];
+
+        // Calculate total earnings
+        const totalEarnings = earningsData.reduce((total, earnings) => total + earnings, 0);
+        
+        // Clamp the minimum and maximum values
+        var minValue = Math.min(Math.min(...earningsData), totalEarnings);
+        var maxValue = Math.max(Math.max(...earningsData), totalEarnings);
+
+        // Calculate the suggested minimum and maximum values
+        var suggestedMinn = minValue * 1.1;
+        var suggestedMaxx = maxValue * 1.1;
+        
+
+        // Create the chart
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: stockNames,
+                datasets: [{
+                    label: 'Stock Earnings',
+                    data: [totalEarnings, ...earningsData],
+                    backgroundColor: [totalEarnings < 0 ? 'rgba(255, 100, 100, 0.70)' : 'rgba(100, 255, 100, 0.7)', ...earningsData.map(earnings => earnings < 0 ? 'rgba(255, 100, 100, 0.7)' : 'rgba(100, 255, 100, 0.7)')],
+                    borderWidth: 2,
+                    borderColor: [totalEarnings < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)', ...earningsData.map(earnings => earnings < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)')],
+                    borderRadius: 5,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    y: {
+                        suggestedMin: suggestedMinn,
+                        suggestedMax: suggestedMaxx
+                    }
+                }
+            }
+        });
+    </script>
