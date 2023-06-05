@@ -15,20 +15,35 @@ namespace StockSavvy.Pages
         {
             _logger = logger;
         }
-        public IActionResult Logout(UserService userService)
+
+        public IActionResult OnPostLogoutRequest(UserService userService)
         {
             if (HttpContext.Request.Cookies.Count > 0)
             {
                 var siteCookies = HttpContext.Request.Cookies.Where(c => c.Key.Contains(".AspNetCore.") || c.Key.Contains("Microsoft.Authentication"));
                 foreach (var cookie in siteCookies)
                 {
-                    // Response.Cookies.Delete(cookie.Key);
+                    Response.Cookies.Delete(cookie.Key);
                 }
             }
 
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //HttpContext.Session.Clear();
+            return RedirectToPage("/Index");
+        }
+        public IActionResult OnPostLogout(UserService userService)
+        {
+            if (HttpContext.Request.Cookies.Count > 0)
+            {
+                var siteCookies = HttpContext.Request.Cookies.Where(c => c.Key.Contains(".AspNetCore.") || c.Key.Contains("Microsoft.Authentication"));
+                foreach (var cookie in siteCookies)
+                {
+                    Response.Cookies.Delete(cookie.Key);
+                }
+            }
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Login");
+            return RedirectToPage("/Index");
         }
 
 

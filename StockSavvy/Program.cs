@@ -1,11 +1,9 @@
 using System.Reflection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StockSavvy.Services;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using TokenOptions = StockSavvy.Services.TokenOptions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,11 +33,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddHttpContextAccessor();
 //builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddControllersWithViews()
-    .AddFluentValidation(option => option.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
-
-
-
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizePage("/Home");
+    options.Conventions.AuthorizePage("/Stock");
+    options.Conventions.AuthorizePage("/Portfolio");
+    options.Conventions.AuthorizeFolder("/Pages");
+});
 // Add services to the container.
 builder.Services.AddRazorPages();
 
@@ -55,6 +55,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 
 app.UseRouting();
 

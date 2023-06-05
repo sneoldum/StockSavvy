@@ -33,7 +33,7 @@ namespace StockSavvy.Pages
 
         private readonly IHttpContextAccessor _contextAccessor;
 
-        public IndexModel(ILogger<IndexModel> logger, IHttpContextAccessor contextAccessor )
+        public IndexModel(ILogger<IndexModel> logger, IHttpContextAccessor contextAccessor)
         {
             _logger = logger;
             _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
@@ -44,62 +44,50 @@ namespace StockSavvy.Pages
         {
             if (UserName != null)
             {
-                var userToCheck = userService.GetOneByUsername(UserName);
-
-                
-
-                //string s = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-
-                if (userToCheck != null)
+                try
                 {
-                    if (HashingHelper.VerifyPasswordHash(Password, userToCheck.PasswordHash, userToCheck.PasswordSalt))
+                    var userToCheck = userService.GetOneByUsername(UserName);
+                    if (userToCheck != null)
                     {
-                        var claims = new List<Claim>() {
-                            new Claim(ClaimTypes.NameIdentifier, Convert.ToString(userToCheck.Id))
-                        };
-                        var identity = new ClaimsIdentity(claims, "site");
+                        if (HashingHelper.VerifyPasswordHash(Password, userToCheck.PasswordHash,
+                                userToCheck.PasswordSalt))
+                        {
+                            var claims = new List<Claim>()
+                            {
+                                new Claim(ClaimTypes.NameIdentifier, Convert.ToString(userToCheck.Id))
+                            };
+                            var identity = new ClaimsIdentity(claims, "site");
 
-                        _contextAccessor.HttpContext!.SignInAsync(new GenericPrincipal(identity, null)).Wait();
+                            _contextAccessor.HttpContext!.SignInAsync(new GenericPrincipal(identity, null)).Wait();
 
-
-
-                        return RedirectToPage("/Home");
+                            return RedirectToPage("/Home");
+                        }
+                        else
+                        {
+                            UserLoginEx = "Please check your password or Username!";
+                        }
                     }
                     else
                     {
-                        UserLoginEx = "Please check your password or Username!";
+                        UserLoginEx = "User not exists!";
                     }
                 }
-                else
+                catch (Exception e)
                 {
                     UserLoginEx = "User not exists!";
+                    throw;
                 }
             }
             return Page();
-
         }
 
         public void OnPostRegisterRequest(UserService userService)
         {
             if (UserName != null)
             {
-                //var userToCheck = userService.GetOneByUsername(UserName);
-
-                //if (userToCheck !=null)
-                //{
-                //    UserRegisterEx = "User already exists!";
-                //}
-                //else
-                //{
-
-                    byte[] userHash, userSalt;
+                byte[] userHash, userSalt;
 
                 HashingHelper.CreatePasswordHash(Password, out userHash, out userSalt);
-
-
-                //string userHashStr = System.Text.Encoding.UTF8.GetString(userHash, 0, userHash.Length);
-                //string userSaltStr = System.Text.Encoding.UTF8.GetString(userSalt, 0, userSalt.Length);
-
 
                 var user = new UserMongoModel
                 {
@@ -111,17 +99,8 @@ namespace StockSavvy.Pages
                     Status = true
                 };
 
-                //var user = new UserMongoModel();
-                //user.PasswordHash = Password;
-                //user.FirstName=FirstName; 
-                //user.LastName=LastName;
-                //user.Username = UserName;
-                //user.PasswordSalt = Password;
-                //user.Status = true;
-
                 userService.Create(user);
-                    UserRegisterEx = "User registered successfully!";
-                //}
+                UserRegisterEx = "User registered successfully!";
 
             }
         }

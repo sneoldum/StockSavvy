@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using StockSavvy.Models;
 using StockSavvy.Services;
 using static StockSavvy.Models.StockModel;
 
@@ -47,12 +50,66 @@ namespace StockSavvy.Pages
         public string key { get; set; }
 
         [BindProperty]
+        public double Amount { get; set; }
+        [BindProperty]
         public string dataExJson { get; set; }
 
+        [BindProperty]
+        public string UserName { get; set; }
+
+        public string UserStock { get; set; }
+
+        public IActionResult OnPostLogoutRequest(UserService userService)
+        {
+            if (HttpContext.Request.Cookies.Count > 0)
+            {
+                var siteCookies = HttpContext.Request.Cookies.Where(c => c.Key.Contains(".AspNetCore.") || c.Key.Contains("Microsoft.Authentication"));
+                foreach (var cookie in siteCookies)
+                {
+                    Response.Cookies.Delete(cookie.Key);
+                }
+            }
+
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            //HttpContext.Session.Clear();
+            return RedirectToPage("/Index");
+        }
+
+        public void OnPostAddPortfolioRequest(PortfolioService portfolioService, UserService userService,IndexModel indexModel, StockService stockService)
+        {
+            UserName = indexModel.UserName;
+
+            var dataClose = Convert.ToDouble(DataClose);
+
+
+            var stockMongoModel = new StockMongoModel()
+            {
+                StockCode = StockCode,
+                Amount = Amount,
+                Status = true,
+                AverageCost = dataClose * Amount
+            };
+            stockService.Create(stockMongoModel);
+
+
+
+            var usersPortfolio = portfolioService.GetOneByUserId(userService.GetOneByUsername(UserName).Id);
+            var portfolio = new PortfolioMongoModel()
+            {
+
+                UserId = userService.GetOneByUsername(UserName).Id,
+                Status = true
+
+            };
+            portfolio.Stocks.Add();
+            portfolioService.Create(portfolio);
+
+        }
 
         public void OnPostStockRequest(StockService stockService)
-
         {
+
+            
             var stockModel = stockService.GetStockModel(StockCode,key);
 
             if (stockModel.json == "{\n    \"Note\": \"Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency.\"\n}")
@@ -87,7 +144,10 @@ namespace StockSavvy.Pages
                 DataHigh = firstOrDefaultValue.High;
                 DataLow = firstOrDefaultValue.Low;
                 DataVolume = firstOrDefaultValue.Volume;
+                UserStock = StockCode;
+
             }
+
         }
         public void OnGet()
         {

@@ -38,7 +38,11 @@
                     <h4 style="display: inline; " class="badge rounded-pill bg-danger">-%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) / (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3).ToString().Replace("-",""))</h4>
 
                 }
-
+                <form method="post" asp-page-handler="AddPortfolioRequest">
+                    <input class="" style="width: 44%;" type="search" placeholder="" asp-for="StockCode" />
+                    <input style="width: 45%;" type="search" placeholder="Enter your Alpha Vantage Api key" asp-for="key" />
+                    <button class="btn btn-outline-success">Add to portfolio</button>
+                </form>
 
             </div>
             <div class="row">
