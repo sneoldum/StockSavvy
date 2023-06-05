@@ -43,7 +43,7 @@
             <div class="row">
                 <div class="col-8">
                     <h6>@Model.DataLast</h6>
-                    <div id="chart" class="chart"></div>
+                    <canvas id="stockChart" class="stockChart"></canvas>
                 </div>
                 <div class="col-4">
                     <table class="table">
@@ -78,86 +78,79 @@
     </div>
 </div>
 @section Scripts {
-    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Set dimensions and margins for the chart
-        const margin = { top: 70, right: 30, bottom: 40, left: 80 };
-        const width = 800 - margin.left - margin.right;
-        const height = 400 - margin.top - margin.bottom;
-
-        // Set up the x and y scales
-        const x = d3.scaleTime().range([0, width]);
-        const y = d3.scaleLinear().range([height, 0]);
-
-        // Create the SVG element and append it to the chart container
-        const svg = d3
-            .select("#chart")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        // Get the data from the server-side
         const dataList = @Json.Serialize(Model.DataList);
-        const dateDate = @Json.Serialize(Model.Date);
+        const labels = @Json.Serialize(Model.Date);
         console.log(dataList);
-        console.log(dateDate);
+        console.log(labels);
+        var ctx = document.getElementById('stockChart').getContext('2d');
+        
+        // Extract the necessary data from the dataList and dateList
+        var stockPrices = dataList.map(data => parseFloat(data['4. close']));
+        stockPrices.reverse();
+        labels.reverse();
+        // Define the desired minimum and maximum values for the y-axis
+        var desiredMinValue = 50; // Replace with your desired minimum value
+        var desiredMaxValue = 200; // Replace with your desired maximum value
+        
+        // Clamp the minimum and maximum values
+        var minValue = Math.max(Math.min(...stockPrices), desiredMinValue);
+        var maxValue = Math.min(Math.max(...stockPrices), desiredMaxValue);
+        
+        // Calculate the range of values
+        var valueRange = maxValue - minValue;
+        
+        // Adjust the y-axis scale to fit the clamped range
+        var suggestedMin = minValue - (valueRange * 0.01); // Adjust the factor (0.1) as needed
+        var suggestedMax = maxValue + (valueRange * 0.01); // Adjust the factor (0.1) as needed
+        
+        // Define the gradient colors based on the last value minus the first value
+        var lastValue = stockPrices[stockPrices.length - 1];
+        var firstValue = stockPrices[0];
+        
+        var gradientColorStart;
+        var gradientColorEnd;
+        
+        if (lastValue - firstValue > 0) {
+            gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
+            gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
+        } else {
+            gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
+            gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Yellow
+        }
+        
+        // Create the gradient
+        var gradient = ctx.createLinearGradient(0, 400, 0, 0);
+        gradient.addColorStop(0, gradientColorStart);
+        gradient.addColorStop(1, gradientColorEnd);
+        
+        // Create the chart
+        var stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Stock Prices',
+                    data: stockPrices,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                    borderWidth: 1,
+                    fill: true
+                }]
+            },
+            options: {
+                tension: 0.5,
+                responsive: true,
+                scales: {
+                    y: {
+                        suggestedMin: suggestedMin,
+                        suggestedMax: suggestedMax
+                    }
+                }
+            }
+        });
 
-        // Extract the required properties from each data point
-        const parsedData = dataList.map((d, i) => ({
-            date: new Date(dateDate[i]),
-            value: parseFloat(d["4. close"])
-        }));
-
-        // Define the x and y domains
-        x.domain(d3.extent(parsedData, (d) => d.date));
-        y.domain([d3.min(parsedData, (d) => d.value), d3.max(parsedData, (d) => d.value)]);
-
-        // Add the x-axis
-        svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(d3.timeHour.every(1)).tickFormat(d3.timeFormat("%I %p")));
-
-        // Add the y-axis
-        svg.append("g").call(d3.axisLeft(y));
-
-        // Create the line generator
-        const line = d3
-            .line()
-            .x((d) => x(d.date))
-            .y((d) => y(d.value));
-
-        // Create the area generator
-        const area = d3
-            .area()
-            .x((d) => x(d.date))
-            .y0(height)
-            .y1((d) => y(d.value));
-
-        // Add the area path to the SVG element
-        svg
-            .append("path")
-            .datum(parsedData)
-            .attr("fill", d3.color("#2986cc"))
-            .attr("d", area);
-
-        // Add the line path to the SVG element
-        svg
-            .append("path")
-            .datum(parsedData)
-            .attr("fill", "none")
-            .attr("stroke", d3.color("#1e5782"))
-            .attr("stroke-width", 2)
-            .attr("d", line);
-
-        // Add circles for each data point
-        svg
-            .selectAll("circle")
-            .data(parsedData)
-            .enter()
-            .append("circle")
-            .attr("cx", (d) => x(d.date))
-            .attr("cy", (d) => y(d.value))
-            .attr("r", 2)
-            .attr("fill", d3.color("#1e5782"));
+    
     </script>
 }
