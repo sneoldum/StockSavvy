@@ -19,7 +19,8 @@ namespace StockSavvy.Pages
         {
             stocks = new List<StockMongoModel>();
 
-            var userName = "hakan";
+            var userName = Request.Cookies["username"];
+            
 
             var UserService = new UserService();
             var user = UserService.GetOneByUsername(userName);
