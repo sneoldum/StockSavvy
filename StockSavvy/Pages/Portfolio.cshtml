@@ -58,6 +58,10 @@
         <div class="col-md-6">
             <div class="chart-container">
                 <div class="portfolio-container">
+                    @foreach (var stock in Model.stocks)
+                    {
+                        //Console.WriteLine(@(stock.StockCode));
+                    }
                     <canvas id="earnings-chart"></canvas>
                 </div>
             </div>

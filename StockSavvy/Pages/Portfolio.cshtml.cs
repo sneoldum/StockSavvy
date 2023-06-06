@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -36,6 +38,18 @@ namespace StockSavvy.Pages
                     var stock = StockService.GetOneById(new ObjectId(id));
                     stocks.Add(stock);
                 }
+            }
+        }
+
+        public int GetStockPrice(string symbol)
+        {
+            string QUERY_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol="+symbol+"&apikey=asdasd";
+            Uri queryUri = new Uri(QUERY_URL);
+
+            using (WebClient client = new WebClient())
+            {
+                dynamic json_data = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(client.DownloadString(queryUri));
+                return json_data["Global Quote"]["05. price"];
             }
         }
     }
