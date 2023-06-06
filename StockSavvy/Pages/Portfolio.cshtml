@@ -44,7 +44,7 @@
                 {
                     <div class="stock-item">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Apple-logo.png/640px-Apple-logo.png" alt="@stock.StockCode" class="stock-image">
-                        <span class="stock-code">@stock.StockCode</span>
+                        <span class="stock-code">@stock.StockCode.ToUpper()</span>
                         <span class="ml-auto">$@(stock.Amount * stock.AverageCost)</span>
                     </div>
                 }
@@ -70,21 +70,43 @@
     <script>
     var palette = ['#F66D44', '#E6F69D', '#8d81b2', '#AADEA7', '#d44848', '#2D87BB',  '#9d725e', '#5ec6ec', '#86a4a6', '#64C2A6', '#FEAE65', '#ef8cdd'];
     var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
+    console.log(portfolioData);
+    //this is a sample for using data: var stockPrices = dataList.map(data => parseFloat(data['4. close']));
     var stockData = portfolioData.map(stock => ({
-        symbol: stock.StockCode,
-        value: stock.Amount * stock.AverageCost
+        symbol: stock['stockCode'].toUpperCase(),
+        value: stock['amount'] * stock['averageCost'],
+        averageCost: stock['averageCost'],
+        amount: stock['amount']
     }));
+    console.log(stockData);
     
     var donutChart = new Chart(document.getElementById('donut-chart'), {
         type: 'doughnut',
         data: {
             labels: stockData.map(stock => stock.symbol),
+            usePointStyle: true,
             datasets: [{
                 data: stockData.map(stock => stock.value),
-                backgroundColor: palette.slice(0, stockData.length)
-            }]
+                backgroundColor: palette.slice(0, stockData.length),
+                borderRadius: 10
+            }],
         },
         options: {
+            animation: {
+                animateScale: true, // Add animation to scale the chart
+                animateRotate: true // Add animation to rotate the chart
+            },
+            cutout: '80%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 10,
+                        boxWidth: 3
+                    }
+                }
+            },
             tooltips: {
                 callbacks: {
                     label: function (tooltipItem, data) {
@@ -98,5 +120,7 @@
             }
         }
     });
+
 </script>
+
 }
