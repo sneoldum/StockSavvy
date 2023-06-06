@@ -60,7 +60,7 @@
                 <div class="portfolio-container">
                     @foreach (var stock in Model.stocks)
                     {
-                        //Console.WriteLine(@(stock.StockCode));
+                        Console.WriteLine(@Model.GetStockPrice(stock.StockCode));
                     }
                     <canvas id="earnings-chart"></canvas>
                 </div>
@@ -128,21 +128,35 @@
 </script>
     <script>
         var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
-        //this is a sample for using data: var stockPrices = dataList.map(data => parseFloat(data['4. close']));
+        var prices = @Html.Raw(Json.Serialize(Model.prices));
         var stockData = portfolioData.map(stock => ({
             symbol: stock['stockCode'].toUpperCase(),
             value: stock['amount'] * stock['averageCost'],
             averageCost: stock['averageCost'],
             amount: stock['amount']
         }));
+        var stockPrices = prices.map(price => ({
+            symbol: price['stockCode'].toUpperCase(),
+            price: price['price']
+        }));
+        
+        // get earnings stockPrices.price minus stockData.averageCost multiplied by stockData.amount compare with symbol
+        var earnings = stockData.map(stock => {
+            var matchingPrice = stockPrices.find(price => price.symbol === stock.symbol);
+            var earningsValue = (matchingPrice.price - stock.averageCost) * stock.amount;
+            return {
+                symbol: stock.symbol,
+                value: earningsValue
+            };
+        });
+        
             
         // Calculate total earnings
-        const totalMoney = stockData.reduce((total, stock) => total + stock.value, 0);
-        console.log(totalMoney);
+        const totalEarnings = earnings.reduce((total, stock) => total + stock.value, 0);
         
         // Clamp the minimum and maximum values
-        const minValue = Math.min(Math.min(...stockData.map(stock => stock.value), totalMoney));
-        const maxValue = Math.max(Math.max(...stockData.map(stock => stock.value), totalMoney));
+        const minValue = Math.min(Math.min(...earnings.map(stock => stock.value), totalEarnings));
+        const maxValue = Math.max(Math.max(...earnings.map(stock => stock.value), totalEarnings));
 
         // Calculate the suggested minimum and maximum values
         var SuggestedMin = minValue * 1.1;
@@ -154,13 +168,13 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Total Earnings', ...stockData.map(stock => stock.symbol)],
+                labels: ['Total Earnings', ...earnings.map(stock => stock.symbol)],
                 datasets: [{
                     label: 'Stock Earnings',
-                    data: [totalMoney, ...stockData.map(stock => stock.value)],
-                    backgroundColor: [totalMoney < 0 ? 'rgba(255, 100, 100, 0.70)' : 'rgba(100, 255, 100, 0.7)', ...stockData.map(earnings => earnings.value < 0 ? 'rgba(255, 100, 100, 0.7)' : 'rgba(100, 255, 100, 0.7)')],
+                    data: [totalEarnings, ...earnings.map(stock => stock.value)],
+                    backgroundColor: [totalEarnings < 0 ? 'rgba(255, 100, 100, 0.70)' : 'rgba(100, 255, 100, 0.7)', ...earnings.map(earnings => earnings.value < 0 ? 'rgba(255, 100, 100, 0.7)' : 'rgba(100, 255, 100, 0.7)')],
                     borderWidth: 2,
-                    borderColor: [totalMoney < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)', ...stockData.map(earnings => earnings.value < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)')],
+                    borderColor: [totalEarnings < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)', ...earnings.map(earnings => earnings.value < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)')],
                     borderRadius: 5,
                     borderSkipped: false,
                 }]

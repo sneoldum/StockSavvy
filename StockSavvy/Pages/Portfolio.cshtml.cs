@@ -16,10 +16,12 @@ namespace StockSavvy.Pages
     {
         [BindProperty]
         public List<StockMongoModel> stocks{ get; set; }
+        public List<StockPriceModel> prices { get; set; }
 
         public void OnGet()
         {
             stocks = new List<StockMongoModel>();
+            prices = new List<StockPriceModel>();
 
             var userName = Request.Cookies["username"];
             
@@ -40,16 +42,43 @@ namespace StockSavvy.Pages
                 }
             }
         }
-
-        public int GetStockPrice(string symbol)
+        
+        private static string RandomString(int length)
         {
-            string QUERY_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol="+symbol+"&apikey=asdasd";
+            Random random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            char[] stringChars = new char[length];
+
+            for (int i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            return new string(stringChars);
+        }
+        
+        public decimal GetStockPrice(string symbol)
+        {
+            string QUERY_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol="+symbol+"&apikey=" + RandomString(5);
             Uri queryUri = new Uri(QUERY_URL);
 
             using (WebClient client = new WebClient())
             {
-                dynamic json_data = JsonSerializer.Deserialize<Dictionary<string, dynamic>>(client.DownloadString(queryUri));
-                return json_data["Global Quote"]["05. price"];
+                var json_data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(client.DownloadString(queryUri));
+                var data = json_data["Global Quote"];
+                string priceString = data.GetProperty("05. price").GetString();
+                if (decimal.TryParse(priceString, out decimal price))
+                {
+                    StockPriceModel stockPrice = new StockPriceModel();
+                    stockPrice.StockCode = symbol;
+                    stockPrice.Price = Convert.ToSingle(price);
+                    prices.Add(stockPrice);
+                    return price;
+                }
+                else
+                {
+                    return -1;
+                }
             }
         }
     }
