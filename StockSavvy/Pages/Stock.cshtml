@@ -131,16 +131,14 @@ ViewData["Title"] = "Home page";
         gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
         gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
         var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
-        // Add the gradient colors
-            gradientFill.addColorStop(0, gradientColorEnd);
-            gradientFill.addColorStop(1, gradientColorStart);
+        gradientFill.addColorStop(0, gradientColorEnd);
+        gradientFill.addColorStop(1, gradientColorStart);
     } else {
         gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
         gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
         var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
-        // Add the gradient colors
-                    gradientFill.addColorStop(0, gradientColorEnd);
-                    gradientFill.addColorStop(1, gradientColorStart);
+        gradientFill.addColorStop(0, gradientColorEnd);
+        gradientFill.addColorStop(1, gradientColorStart);
     }
     
     // Create the chart
