@@ -35,27 +35,68 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="portfolio-container">
-                    <h3>Stock Portfolio</h3>
-                    @foreach (var stock in Model.stocks)
-                    {
-                        <div class="stock-item">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Apple-logo.png/640px-Apple-logo.png" alt="@stock.StockCode" class="stock-image">
-                            <span class="stock-code">@stock.StockCode</span>
-                            <span class="ml-auto">$@(stock.Amount * stock.AverageCost)</span>
-                        </div>
-                    }
-                </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="portfolio-container">
+                <h3>Stock Portfolio</h3>
+                @foreach (var stock in Model.stocks)
+                {
+                    <div class="stock-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Apple-logo.png/640px-Apple-logo.png" alt="@stock.StockCode" class="stock-image">
+                        <span class="stock-code">@stock.StockCode</span>
+                        <span class="ml-auto">$@(stock.Amount * stock.AverageCost)</span>
+                    </div>
+                }
             </div>
-            <div class="col-md-8">
-                <div class="chart-container">
-                    <!-- Add your chart here -->
+        </div>
+        <div class="col-md-3">
+                    <div class="portfolio-container">
+                        <canvas id="donut-chart"></canvas>
+                    </div>
                 </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <!-- Add your chart here -->
             </div>
         </div>
     </div>
+</div>
 </body>
 </html>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    var palette = ['#F66D44', '#E6F69D', '#8d81b2', '#AADEA7', '#d44848', '#2D87BB',  '#9d725e', '#5ec6ec', '#86a4a6', '#64C2A6', '#FEAE65', '#ef8cdd'];
+    var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
+    var stockData = portfolioData.map(stock => ({
+        symbol: stock.StockCode,
+        value: stock.Amount * stock.AverageCost
+    }));
+    
+    var donutChart = new Chart(document.getElementById('donut-chart'), {
+        type: 'doughnut',
+        data: {
+            labels: stockData.map(stock => stock.symbol),
+            datasets: [{
+                data: stockData.map(stock => stock.value),
+                backgroundColor: palette.slice(0, stockData.length)
+            }]
+        },
+        options: {
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                        var index = tooltipItem.index;
+                        var value = dataset.data[index];
+                        var symbol = data.labels[index];
+                        return symbol + ": $" + value + "";
+                    }
+                }
+            }
+        }
+    });
+</script>
+}
