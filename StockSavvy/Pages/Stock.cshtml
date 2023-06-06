@@ -5,6 +5,21 @@ ViewData["Title"] = "Home page";
 }
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
 
+<head>
+    <style>
+        .col {
+            display: grid;
+            grid-template-columns: 70% 30%; /* Set the columns width ratio */
+            gap: 10px; /* Add some spacing between the columns */
+        }
+    
+        .col-1,
+        .col-2 {
+            background-color: rgba(220, 220, 220, 0.1);;
+            padding: 10px;
+        }
+    </style>
+</head>
 
 <div class="container">
     <div>
@@ -21,79 +36,55 @@ ViewData["Title"] = "Home page";
         }
         else if (Model.DataList != null)
         {
-        <div>
-            <h1 style="display: inline">@Model.DataSymbol</h1>
+            <div>
+                <h1 style="display: inline">@Model.DataSymbol</h1>
 
-            @if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) - (Convert.ToDouble(Model.DataOpen.Replace(".",
-            ",")))) > 0)
-            {
-            <h4 style="display: inline; " class="badge rounded-pill bg-success">
-                +%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
-                (((Convert.ToDouble(Model.DataOpen.Replace(".", ",")))))*100)-100 ,3)) </h4>
-            }
-            else if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) -
-            (Convert.ToDouble(Model.DataOpen.Replace(".", ",")))) == 0)
-            {
-            <h4 style="display: inline; color: grey" class="badge rounded-pill bg-secondary">
-                %@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
-                (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3)) </h4>
+                @if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) - (Convert.ToDouble(Model.DataOpen.Replace(".",
+                    ",")))) > 0)
+                {
+                    <h4 style="display: inline; " class="badge rounded-pill bg-success">
+                        +%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                                               (((Convert.ToDouble(Model.DataOpen.Replace(".", ",")))))*100)-100 ,3)) </h4>
+                }
+                else if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) -
+                          (Convert.ToDouble(Model.DataOpen.Replace(".", ",")))) == 0)
+                {
+                    <h4 style="display: inline; color: grey" class="badge rounded-pill bg-secondary">
+                        %@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                                              (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3)) </h4>
 
-            }
-            else
-            {
-            <h4 style="display: inline; " class="badge rounded-pill bg-danger">
-                -%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
-                (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3).ToString().Replace("-",""))
-            </h4>
+                }
+                else
+                {
+                    <h4 style="display: inline; " class="badge rounded-pill bg-danger">
+                        -%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                                               (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3).ToString().Replace("-",""))
+                    </h4>
 
-            }
+                }
 
-
-        </div>
-        <div class="row">
-            <div class="col-8">
-
-                <h6>@Model.DataLast</h6>
-                <canvas id="stockChart" width="100" height="100"></canvas>
-            </div>
-            <div class="col-4">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Update date</th>
-                            <th scope="col">Open</th>
-                            <th scope="col">Close</th>
-                            <th scope="col">Volume</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        @if (Model.DataList != null)
-                        {
-                        int i = 1;
-                        @foreach (var data in Model.DataList)
-                        {
-
-                        <tr>
-                            <td>@Model.Date[i-1]</td>
-                            <td>@data.Open</td>
-                            <td>@data.Close</td>
-                            <td>@data.Volume</td>
-
-                        </tr>
-                        i++;
-                        }
-                        }
-                    </tbody>
-                </table>
 
             </div>
-        </div>
-
-
-
+            
+            <div class="col">
+                <div class="col-1">
+                    <h6>@Model.DataLast</h6>
+                    <canvas id="stockChart"></canvas>
+                </div>
+                <div class="col-2">
+                    <h6>Open</h6>
+                    <h6>@Model.DataOpen</h6>
+                    <h6>High</h6>
+                    <h6>@Model.DataHigh</h6>
+                    <h6>Low</h6>
+                    <h6>@Model.DataLow</h6>
+                    <h6>Close</h6>
+                    <h6>@Model.DataClose</h6>
+                    <h6>Volume</h6>
+                    <h6>@Model.DataVolume</h6>
+                </div>
+            </div>
         }
-
     </div>
 </div>
 
