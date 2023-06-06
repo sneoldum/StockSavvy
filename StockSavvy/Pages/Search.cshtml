@@ -1,0 +1,33 @@
+﻿@page
+@model StockSavvy.Pages.SearchModel
+@{
+    ViewData["Title"] = "Search Stock";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Search Page</h1>
+        <form method="get" action="/Search">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search..." name="query">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+        @if (!string.IsNullOrEmpty(Model.Query))
+        {
+            <!-- Stock Results -->
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
