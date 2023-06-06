@@ -51,10 +51,10 @@
             </div>
         </div>
         <div class="col-md-3">
-                    <div class="portfolio-container">
-                        <canvas id="donut-chart"></canvas>
-                    </div>
-                </div>
+            <div class="portfolio-container">
+                <canvas id="donut-chart"></canvas>
+            </div>
+        </div>
         <div class="col-md-6">
             <div class="chart-container">
                 <div class="portfolio-container">
@@ -72,7 +72,6 @@
     <script>
     var palette = ['#F66D44', '#E6F69D', '#8d81b2', '#AADEA7', '#d44848', '#2D87BB',  '#9d725e', '#5ec6ec', '#86a4a6', '#64C2A6', '#FEAE65', '#ef8cdd'];
     var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
-    console.log(portfolioData);
     //this is a sample for using data: var stockPrices = dataList.map(data => parseFloat(data['4. close']));
     var stockData = portfolioData.map(stock => ({
         symbol: stock['stockCode'].toUpperCase(),
@@ -80,7 +79,6 @@
         averageCost: stock['averageCost'],
         amount: stock['amount']
     }));
-    console.log(stockData);
     
     var donutChart = new Chart(document.getElementById('donut-chart'), {
         type: 'doughnut',
@@ -124,5 +122,58 @@
     });
 
 </script>
+    <script>
+        var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
+        //this is a sample for using data: var stockPrices = dataList.map(data => parseFloat(data['4. close']));
+        var stockData = portfolioData.map(stock => ({
+            symbol: stock['stockCode'].toUpperCase(),
+            value: stock['amount'] * stock['averageCost'],
+            averageCost: stock['averageCost'],
+            amount: stock['amount']
+        }));
+            
+        // Calculate total earnings
+        const totalMoney = stockData.reduce((total, stock) => total + stock.value, 0);
+        console.log(totalMoney);
+        
+        // Clamp the minimum and maximum values
+        const minValue = Math.min(Math.min(...stockData.map(stock => stock.value), totalMoney));
+        const maxValue = Math.max(Math.max(...stockData.map(stock => stock.value), totalMoney));
 
+        // Calculate the suggested minimum and maximum values
+        var SuggestedMin = minValue * 1.1;
+        var SuggestedMax = maxValue * 1.1;
+        
+
+        // Create the chart
+        const ctx = document.getElementById('earnings-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Earnings', ...stockData.map(stock => stock.symbol)],
+                datasets: [{
+                    label: 'Stock Earnings',
+                    data: [totalMoney, ...stockData.map(stock => stock.value)],
+                    backgroundColor: [totalMoney < 0 ? 'rgba(255, 100, 100, 0.70)' : 'rgba(100, 255, 100, 0.7)', ...stockData.map(earnings => earnings.value < 0 ? 'rgba(255, 100, 100, 0.7)' : 'rgba(100, 255, 100, 0.7)')],
+                    borderWidth: 2,
+                    borderColor: [totalMoney < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)', ...stockData.map(earnings => earnings.value < 0 ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 210, 0, 1)')],
+                    borderRadius: 5,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    y: {
+                        suggestedMin: SuggestedMin,
+                        suggestedMax: SuggestedMax
+                    }
+                }
+            }
+        });
+    
+    </script>
 }
