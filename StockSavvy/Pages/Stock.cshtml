@@ -126,20 +126,23 @@ ViewData["Title"] = "Home page";
 
     var gradientColorStart;
     var gradientColorEnd;
-
+    
     if (lastValue - firstValue > 0) {
         gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
         gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
+        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
+        // Add the gradient colors
+            gradientFill.addColorStop(0, gradientColorEnd);
+            gradientFill.addColorStop(1, gradientColorStart);
     } else {
         gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
         gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
+        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
+        // Add the gradient colors
+                    gradientFill.addColorStop(0, gradientColorEnd);
+                    gradientFill.addColorStop(1, gradientColorStart);
     }
-
-    // Create the gradient
-    var gradient = ctx.createLinearGradient(0, suggestedMax * 2, 0, suggestedMin / 2);
-    gradient.addColorStop(0, gradientColorStart);
-    gradient.addColorStop(1, gradientColorEnd);
-
+    
     // Create the chart
     var stockChart = new Chart(ctx, {
         type: 'line',
@@ -148,7 +151,7 @@ ViewData["Title"] = "Home page";
             datasets: [{
                 label: stockName,
                 data: stockPrices,
-                backgroundColor: gradient,
+                backgroundColor: gradientFill,
                 borderColor: 'rgba(25, 25, 25, 1)',
                 borderWidth: 1.5,
                 fill: true
@@ -164,10 +167,9 @@ ViewData["Title"] = "Home page";
                 }
             }
         },
-        //
         plugins: [{
             id: 'gradientBg',
-            afterDraw: (chart, args, options) => {
+            beforeDraw: (chart, args, options) => {
                 const ctx = chart.canvas.getContext('2d');
                 const chartArea = chart.chartArea;
                 const { top, right, bottom, left, width, height } = chartArea;
@@ -178,6 +180,5 @@ ViewData["Title"] = "Home page";
             }
         }]
     });
-
 </script>
 }
