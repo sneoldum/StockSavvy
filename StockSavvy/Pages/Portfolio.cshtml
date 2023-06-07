@@ -59,7 +59,7 @@
                 <div class="portfolio-container">
                     @foreach (var stock in Model.stocks)
                     {
-                        Console.WriteLine(Model.GetStockPrice(stock.StockCode));
+                        Console.WriteLine(Model.GetCyrptoPrice(stock.StockCode));
                     }
                     <canvas id="earnings-chart"></canvas>
                 </div>

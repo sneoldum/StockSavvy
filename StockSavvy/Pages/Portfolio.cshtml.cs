@@ -14,10 +14,10 @@ using StockSavvy.Services;
 
 namespace StockSavvy.Pages
 {
-	public class PortfolioModel : PageModel
+    public class PortfolioModel : PageModel
     {
         [BindProperty]
-        public List<StockMongoModel> stocks{ get; set; }
+        public List<StockMongoModel> stocks { get; set; }
         public List<StockPriceModel> prices { get; set; }
 
         public IActionResult OnPostLogoutRequest(UserService userService)
@@ -43,7 +43,7 @@ namespace StockSavvy.Pages
             prices = new List<StockPriceModel>();
 
             var userName = Request.Cookies["username"];
-            
+
 
             var UserService = new UserService();
             var user = UserService.GetOneByUsername(userName);
@@ -61,7 +61,7 @@ namespace StockSavvy.Pages
                 }
             }
         }
-        
+
         private static string RandomString(int length)
         {
             Random random = new Random();
@@ -75,10 +75,31 @@ namespace StockSavvy.Pages
 
             return new string(stringChars);
         }
-        
+
+
+        public decimal GetCyrptoPrice(string CryptoCode)
+        {
+            StockService stockService = new StockService();
+            var stockModel = stockService.GetCryptoModel(CryptoCode);
+            var oldPrice = stockModel.price.Replace(".", ",");
+            if (decimal.TryParse(oldPrice, out decimal price))
+            {
+                StockPriceModel stockPrice = new StockPriceModel();
+                stockPrice.StockCode = CryptoCode;
+                stockPrice.Price = Convert.ToSingle(price);
+                prices.Add(stockPrice);
+                return price;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+
         public decimal GetStockPrice(string symbol)
         {
-            string QUERY_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol="+"IBM"+"&apikey=demo";
+            string QUERY_URL = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + "IBM" + "&apikey=demo";
             Uri queryUri = new Uri(QUERY_URL);
 
             using (WebClient client = new WebClient())
