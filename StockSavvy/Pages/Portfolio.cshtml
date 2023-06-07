@@ -43,7 +43,7 @@
                 @foreach (var stock in Model.stocks)
                 {
                     <div class="stock-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Apple-logo.png/640px-Apple-logo.png" alt="@stock.StockCode" class="stock-image">
+                        <img src="https://s3-symbol-logo.tradingview.com/@Model.GetNameOfStock(@stock.StockCode)--big.svg" alt="@stock.StockCode" class="stock-image">
                         <span class="stock-code">@stock.StockCode.ToUpper()</span>
                         <span class="ml-auto">$@(stock.Amount * stock.AverageCost)</span>
                     </div>

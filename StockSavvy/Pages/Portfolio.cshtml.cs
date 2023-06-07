@@ -100,5 +100,27 @@ namespace StockSavvy.Pages
                 }
             }
         }
+
+        public string GetNameOfStock(string symbol)
+        {
+            string QUERY_URL = "https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=" + symbol +
+                               "&apikey=" + RandomString(5);
+            Uri queryUri = new Uri(QUERY_URL);
+
+            using (WebClient client = new WebClient())
+            {
+                var json_data =
+                    JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(client.DownloadString(queryUri));
+                var data = json_data["bestMatches"];
+                var first = data.EnumerateArray().First();
+                string name = first.GetProperty("2. name").GetString();
+                //remove last 4 chars
+                name = name.Substring(0, name.Length - 4);
+                //change -- with empty chars and add -- to last
+                name = name.Replace("--", " ");
+                Console.WriteLine(name);
+                return name.ToLower();
+            }
+        }
     }
 }
