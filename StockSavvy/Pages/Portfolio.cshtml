@@ -100,6 +100,7 @@
                 animateScale: true, // Add animation to scale the chart
                 animateRotate: true // Add animation to rotate the chart
             },
+            responsive: true,
             cutout: '80%',
             plugins: {
                 legend: {
@@ -124,7 +125,11 @@
             }
         }
     });
-
+    function handleResize() {
+        donutChart.resize(); // Resize the chart when the window changes size
+    }
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
 </script>
     <script>
         var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
@@ -165,7 +170,7 @@
 
         // Create the chart
         const ctx = document.getElementById('earnings-chart').getContext('2d');
-        new Chart(ctx, {
+        var chart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['Total Earnings', ...earnings.map(stock => stock.symbol)],
@@ -192,6 +197,11 @@
                 }
             }
         });
+        function handleResize() {
+            chart.resize(); // Resize the chart when the window changes size
+        }
+        // Add event listener for window resize
+        window.addEventListener('resize', handleResize);
     
     </script>
 }
