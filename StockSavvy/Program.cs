@@ -39,6 +39,15 @@ builder.Services.AddControllersWithViews()
     .AddFluentValidation(option => option.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
 
 
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizePage("/Home");
+    options.Conventions.AuthorizePage("/Stock");
+    options.Conventions.AuthorizePage("/Portfolio");
+    options.Conventions.AuthorizePage("/Privacy");
+    options.Conventions.AuthorizeFolder("/Pages");
+});
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
