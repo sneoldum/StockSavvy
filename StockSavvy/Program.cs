@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
         };
     });
-
+builder.Services.AddSingleton<PortfolioService>();
 
 
 builder.Services.AddHttpContextAccessor();

@@ -1,25 +1,25 @@
 ﻿@page
 @model StockSavvy.Pages.StockModel
 @{
-ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home page";
 }
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
 <head>
     <style>
-    button {
-        border: none;
-        color: white;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 12px;
+        button {
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
         }
-        
+
         .col {
             display: grid;
             grid-template-columns: 70% 30%;
@@ -39,164 +39,219 @@ ViewData["Title"] = "Home page";
     <div>
         <form asp-page-handler="StockRequest" method="post" class="form-floating">
             <input class="" style="width: 30%;" type="search" placeholder="Type stock code (eg. AMZN)"
-                asp-for="StockCode" />
+                   asp-for="StockCode" />
             <input style="width: 20%;" type="search" placeholder="Enter your Alpha Vantage Api key" asp-for="key" />
             <button style="background: deepskyblue" class="btn btn-outline-primary">Search</button>
         </form>
 
         @if (Model.dataExJson != null)
         {
-        <h1 class="alert alert-danger" role="alert">@Model.dataExJson</h1>
+            <h1 class="alert alert-danger" role="alert">@Model.dataExJson</h1>
         }
         else if (Model.DataList != null)
         {
-        <div>
-            <h1 style="display: inline">@Model.DataSymbol</h1>
-
-            @if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) - (Convert.ToDouble(Model.DataOpen.Replace(".",
-            ",")))) > 0)
-            {
-            <h4 style="display: inline; " class="badge rounded-pill bg-success">
-                +%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
-                (((Convert.ToDouble(Model.DataOpen.Replace(".", ",")))))*100)-100 ,3)) </h4>
-            }
-            else if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) -
-            (Convert.ToDouble(Model.DataOpen.Replace(".", ",")))) == 0)
-            {
-            <h4 style="display: inline; color: grey" class="badge rounded-pill bg-secondary">
-                %@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
-                (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3)) </h4>
-
-            }
-            else
-            {
-            <h4 style="display: inline; " class="badge rounded-pill bg-danger">
-                -%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
-                (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3).ToString().Replace("-",""))
-            </h4>
-
-            }
-
-
-        </div>
-
-        <div class="col">
             <div>
-                <h6>@Model.DataLast</h6>
-                <canvas id="stockChart"></canvas>
+                <h1 style="display: inline">@Model.DataSymbol.ToUpper()</h1>
+
+                @if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) - (Convert.ToDouble(Model.DataOpen.Replace(".",
+               ",")))) > 0)
+                {
+                    <h4 style="display: inline; " class="badge rounded-pill bg-success">
+                        +%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                          (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3))
+                    </h4>
+                }
+                else if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) -
+                (Convert.ToDouble(Model.DataOpen.Replace(".", ",")))) == 0)
+                {
+                    <h4 style="display: inline; color: grey" class="badge rounded-pill bg-secondary">
+                        %@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                           (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3))
+                    </h4>
+
+                }
+                else
+                {
+                    <h4 style="display: inline; " class="badge rounded-pill bg-danger">
+                        -%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                          (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3).ToString().Replace("-", ""))
+                    </h4>
+
+                }
+
+
             </div>
-            <div>
-                <h6>Open</h6>
-                <h6>@Model.DataOpen</h6>
-                <h6>High</h6>
-                <h6>@Model.DataHigh</h6>
-                <h6>Low</h6>
-                <h6>@Model.DataLow</h6>
-                <h6>Close</h6>
-                <h6>@Model.DataClose</h6>
-                <h6>Volume</h6>
-                <h6>@Model.DataVolume</h6>
-                <form>
-                    <button style="background: green">Buy</button>
-                    <button style="background: red">Sell</button>
-                </form>
+
+            <div class="col">
+                <div>
+                    <h6>@Model.DataLast</h6>
+                    <canvas id="stockChart"></canvas>
+                </div>
+                <div>
+                    <h6>Open</h6>
+                    <h6>@Model.DataOpen</h6>
+                    <h6>High</h6>
+                    <h6>@Model.DataHigh</h6>
+                    <h6>Low</h6>
+                    <h6>@Model.DataLow</h6>
+                    <h6>Close</h6>
+                    <h6>@Model.DataClose</h6>
+                    <h6>Volume</h6>
+                    <h6>@Model.DataVolume</h6>
+                    <form asp-page-handler="BuyRequest" method="post">
+                        <button style="background: green">Buy</button>
+                    </form>
+                    <form asp-page-handler="SellRequest" method="post">
+                        <button style="background: red" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Sell</button>
+                    </form>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@@mdo">Buy or sell</button>
+
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+
+                                </div>
+                                <div class="modal-body">
+                                   
+                                </div>
+                                <div class="modal-footer">
+                                    <form asp-page-handler="BuyRequest" method="post">
+                                        <input value="@Model.StockCode.ToUpper()" asp-for="StockCode" ></input>
+                                        <input value="@Model.DataClose" asp-for="DataClose" style="display: none"></input>
+
+                                        <input type="number" class="form-control" id="recipient-name" placeholder="Amount buy" asp-for="Amount">
+                                        <button style="background: green">Buy</button>
+                                    </form>
+                                    <form asp-page-handler="SellRequest" method="post">
+                                        <input type="number" class="form-control" id="recipient-name" placeholder="Amount sell" asp-for="Amount">
+                                        <input value="@Model.StockCode.ToUpper()" asp-for="StockCode"></input>
+                                        <input value="@Model.DataClose" asp-for="DataClose" style="display: none"></input>
+
+
+                                        <button style="background: red" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Sell</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
         }
     </div>
 </div>
 
 @section Scripts {
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const dataList = @Json.Serialize(Model.DataList);
-    const labels = @Json.Serialize(Model.Date);
-    const stockName = @Json.Serialize(Model.DataSymbol);
-    console.log(dataList);
-    console.log(labels);
-    var ctx = document.getElementById('stockChart').getContext('2d');
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const dataList = @Json.Serialize(Model.DataList);
+        const labels = @Json.Serialize(Model.Date);
+        const stockName = @Json.Serialize(Model.DataSymbol);
+        console.log(dataList);
+        console.log(labels);
+        var ctx = document.getElementById('stockChart').getContext('2d');
 
-    // Extract the necessary data from the dataList and dateList
-    var stockPrices = dataList.map(data => parseFloat(data['4. close']));
-    stockPrices.reverse();
-    labels.reverse();
-    // Define the desired minimum and maximum values for the y-axis
-    var desiredMinValue = 50; // Replace with your desired minimum value
-    var desiredMaxValue = 200; // Replace with your desired maximum value
+        // Extract the necessary data from the dataList and dateList
+        var stockPrices = dataList.map(data => parseFloat(data['4. close']));
+        stockPrices.reverse();
+        labels.reverse();
+        // Define the desired minimum and maximum values for the y-axis
+        var desiredMinValue = 50; // Replace with your desired minimum value
+        var desiredMaxValue = 200; // Replace with your desired maximum value
 
-    // Clamp the minimum and maximum values
-    var minValue = Math.max(Math.min(...stockPrices), desiredMinValue);
-    var maxValue = Math.min(Math.max(...stockPrices), desiredMaxValue);
+        // Clamp the minimum and maximum values
+        var minValue = Math.max(Math.min(...stockPrices), desiredMinValue);
+        var maxValue = Math.min(Math.max(...stockPrices), desiredMaxValue);
 
-    // Calculate the range of values
-    var valueRange = maxValue - minValue;
+        // Calculate the range of values
+        var valueRange = maxValue - minValue;
 
-    // Adjust the y-axis scale to fit the clamped range
-    var suggestedMin = minValue - (valueRange * 0.01); // Adjust the factor (0.1) as needed
-    var suggestedMax = maxValue + (valueRange * 0.01); // Adjust the factor (0.1) as needed
+        // Adjust the y-axis scale to fit the clamped range
+        var suggestedMin = minValue - (valueRange * 0.01); // Adjust the factor (0.1) as needed
+        var suggestedMax = maxValue + (valueRange * 0.01); // Adjust the factor (0.1) as needed
 
-    // Define the gradient colors based on the last value minus the first value
-    var lastValue = stockPrices[stockPrices.length - 1];
-    var firstValue = stockPrices[0];
+        // Define the gradient colors based on the last value minus the first value
+        var lastValue = stockPrices[stockPrices.length - 1];
+        var firstValue = stockPrices[0];
 
-    var gradientColorStart;
-    var gradientColorEnd;
-    
-    if (lastValue - firstValue > 0) {
-        gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
-        gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
-        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
-        gradientFill.addColorStop(0, gradientColorEnd);
-        gradientFill.addColorStop(1, gradientColorStart);
-    } else {
-        gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
-        gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
-        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
-        gradientFill.addColorStop(0, gradientColorEnd);
-        gradientFill.addColorStop(1, gradientColorStart);
-    }
-    
-    // Create the chart
-    var stockChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: stockName,
-                data: stockPrices,
-                backgroundColor: gradientFill,
-                borderColor: 'rgba(25, 25, 25, 1)',
-                borderWidth: 1.5,
-                fill: true
-            }]
-        },
-        options: {
-            tension: 0.5,
-            responsive: true,
-            scales: {
-                y: {
-                    suggestedMin: suggestedMin,
-                    suggestedMax: suggestedMax
+        var gradientColorStart;
+        var gradientColorEnd;
+
+        if (lastValue - firstValue > 0) {
+            gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
+            gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
+            var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
+            gradientFill.addColorStop(0, gradientColorEnd);
+            gradientFill.addColorStop(1, gradientColorStart);
+        } else {
+            gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
+            gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
+            var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
+            gradientFill.addColorStop(0, gradientColorEnd);
+            gradientFill.addColorStop(1, gradientColorStart);
+        }
+
+        // Create the chart
+        var stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: stockName,
+                    data: stockPrices,
+                    backgroundColor: gradientFill,
+                    borderColor: 'rgba(25, 25, 25, 1)',
+                    borderWidth: 1.5,
+                    fill: true
+                }]
+            },
+            options: {
+                tension: 0.5,
+                responsive: true,
+                scales: {
+                    y: {
+                        suggestedMin: suggestedMin,
+                        suggestedMax: suggestedMax
+                    }
                 }
-            }
-        },
-        plugins: [{
-            id: 'gradientBg',
-            beforeDraw: (chart, args, options) => {
-                const ctx = chart.canvas.getContext('2d');
-                const chartArea = chart.chartArea;
-                const { top, right, bottom, left, width, height } = chartArea;
-                const gradient = ctx.createLinearGradient(left, bottom, left, top);
-                gradient.addColorStop(0, gradientColorStart);
-                gradient.addColorStop(1, gradientColorEnd);
-                stockChart.data.datasets[0].backgroundColor = gradient;
-            }
-        }]
-    });
-    function handleResize() {
-        stockChart.resize(); // Resize the chart when the window changes size
-    }
-    // Add event listener for window resize
-    window.addEventListener('resize', handleResize);
-</script>
+            },
+            plugins: [{
+                id: 'gradientBg',
+                beforeDraw: (chart, args, options) => {
+                    const ctx = chart.canvas.getContext('2d');
+                    const chartArea = chart.chartArea;
+                    const { top, right, bottom, left, width, height } = chartArea;
+                    const gradient = ctx.createLinearGradient(left, bottom, left, top);
+                    gradient.addColorStop(0, gradientColorStart);
+                    gradient.addColorStop(1, gradientColorEnd);
+                    stockChart.data.datasets[0].backgroundColor = gradient;
+                }
+            }]
+        });
+        function handleResize() {
+            stockChart.resize(); // Resize the chart when the window changes size
+        }
+        // Add event listener for window resize
+        window.addEventListener('resize', handleResize);
+
+
+        const exampleModal = document.getElementById('exampleModal')
+        if (exampleModal) {
+            exampleModal.addEventListener('show.bs.modal', event => {
+                // Button that triggered the modal
+                const button = event.relatedTarget
+                // Extract info from data-bs-* attributes
+                const recipient = button.getAttribute('data-bs-whatever')
+                // If necessary, you could initiate an Ajax request here
+                // and then do the updating in a callback.
+
+                // Update the modal's content.
+                const modalTitle = exampleModal.querySelector('.modal-title')
+                const modalBodyInput = exampleModal.querySelector('.modal-body input')
+
+                modalTitle.textContent = `New message to ${recipient}`
+                modalBodyInput.value = recipient
+            })
+        }
+    </script>
 }

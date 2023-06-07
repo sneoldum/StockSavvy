@@ -18,7 +18,9 @@ namespace StockSavvy.Services
             var database = client.GetDatabase("stocksavvy");
             StockCollection = database.GetCollection<StockMongoModel>("Stock");
         }
+        HashSet<string> stockCodes = new HashSet<string>();
 
+        
         public StockModel? GetStockModel(string stockCode, string apikey)
         {
             if (apikey == null)
@@ -26,11 +28,8 @@ namespace StockSavvy.Services
                 apikey = "demo"; // Your api key 
                 stockCode = "IBM";
             }
-
             string url = string.Concat("https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" +
                                        stockCode + "&interval=5min&apikey=" + apikey);
-
-
             //string url = string.Concat("https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=" + stockCode+"&apikey=", apikey);
 
             var json = new WebClient().DownloadString(url);

@@ -85,7 +85,7 @@ namespace StockSavvy.Pages
             {
                 var json_data = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(client.DownloadString(queryUri));
                 var data = json_data["Global Quote"];
-                string priceString = data.GetProperty("05. price").GetString();
+                string priceString = data.GetProperty("05. price").GetString().Replace(".", ",");
                 if (decimal.TryParse(priceString, out decimal price))
                 {
                     StockPriceModel stockPrice = new StockPriceModel();
@@ -114,10 +114,7 @@ namespace StockSavvy.Pages
                 var data = json_data["bestMatches"];
                 var first = data.EnumerateArray().First();
                 string name = first.GetProperty("2. name").GetString();
-                //remove last 4 chars
-                name = name.Substring(0, name.Length - 4);
-                //change -- with empty chars and add -- to last
-                name = name.Replace("--", " ");
+                name = name.Split(" ")[0];
                 Console.WriteLine(name);
                 return name.ToLower();
             }
