@@ -45,7 +45,7 @@
                     <div class="stock-item">
                         <img src="https://s3-symbol-logo.tradingview.com/@Model.GetNameOfStock(@stock.StockCode)--big.svg" alt="@stock.StockCode" class="stock-image">
                         <span class="stock-code">@stock.StockCode.ToUpper()</span>
-                        <span class="ml-auto">$@(stock.Amount * stock.AverageCost)</span>
+                        <span class="ml-auto">$@((stock.Amount * stock.AverageCost).ToString("##.##"))</span>
                     </div>
                 }
             </div>
@@ -60,7 +60,7 @@
                 <div class="portfolio-container">
                     @foreach (var stock in Model.stocks)
                     {
-                        Console.WriteLine(@Model.GetStockPrice(stock.StockCode));
+                        Console.WriteLine(Model.GetStockPrice(stock.StockCode));
                     }
                     <canvas id="earnings-chart"></canvas>
                 </div>
