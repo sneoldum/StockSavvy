@@ -58,6 +58,14 @@ namespace StockSavvy.Pages
                             var identity = new ClaimsIdentity(claims, "site");
 
                             _contextAccessor.HttpContext!.SignInAsync(new GenericPrincipal(identity, null)).Wait();
+                            CookieOptions options = new CookieOptions
+                            {
+                                // Set any desired options for the cookie (e.g., expiration, domain, etc.)
+                                // For example, to set an expiration of one week:
+                                Expires = DateTime.Now.AddDays(7)
+                            };
+
+                            Response.Cookies.Append("username", UserName, options);
 
                             return RedirectToPage("/Home");
                         }
