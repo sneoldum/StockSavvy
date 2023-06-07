@@ -45,7 +45,7 @@
         </div>
     </div>
     <h1>Satmazsan zararda değilsin!</h1>
-                          <canvas id="stockChart" width="400" height="400"></canvas>
+                          <canvas id="stockChart" width="400" height="200"></canvas>
 }
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -54,103 +54,107 @@
         console.log(CryptoName);
         let price = [];
         let time = [];
-        fetch("https://api.binance.com/api/v3/klines?symbol=" + CryptoName +"USDT&interval=15m&limit=20")
-          .then(response => response.json())
-          .then(data => {
-            for (var i = 0; i < data.length; i++) {
-                price.push(data[i][4]);
-                time.push(data[i][0]);
-            }
-          })
-          .catch(error => {
-            // Handle any errors that occurred during the request
-            console.error('Error:', error);
-          });
-          console.log(price[0]);
-            console.log(time);
+        async function fetchData() {
+          try {
+            const response = await fetch("https://api.binance.com/api/v3/klines?symbol=" + CryptoName +"USDT&interval=15m&limit=20");
+            const data = await response.json();
         
-          
-        var ctx = document.getElementById('stockChart').getContext('2d');
-
-        // Define the desired minimum and maximum values for the y-axis
-        var desiredMinValue = 50; // Replace with your desired minimum value
-        var desiredMaxValue = 200; // Replace with your desired maximum value
-
-        // Clamp the minimum and maximum values
-        var minValue = Math.max(Math.min(...price), desiredMinValue);
-        var maxValue = Math.min(Math.max(...price), desiredMaxValue);
-
-        // Calculate the range of values
-        var valueRange = maxValue - minValue;
-
-        // Adjust the y-axis scale to fit the clamped range
-        var suggestedMin = minValue - (valueRange * 0.01); // Adjust the factor (0.1) as needed
-        var suggestedMax = maxValue + (valueRange * 0.01); // Adjust the factor (0.1) as needed
-
-        // Define the gradient colors based on the last value minus the first value
-        var lastValue = price[price.length - 1];
-        var firstValue = price[0];
-
-        var gradientColorStart;
-        var gradientColorEnd;
-
-        if (lastValue - firstValue > 0) {
-            gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
-            gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
-            var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
-            gradientFill.addColorStop(0, gradientColorEnd);
-            gradientFill.addColorStop(1, gradientColorStart);
-        } else {
-            gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
-            gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
-            var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
-            gradientFill.addColorStop(0, gradientColorEnd);
-            gradientFill.addColorStop(1, gradientColorStart);
-        }
-
-        // Create the chart
-        var stockChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: time,
-                datasets: [{
-                    label: CryptoName,
-                    data: price,
-                    backgroundColor: gradientFill,
-                    borderColor: 'rgba(25, 25, 25, 1)',
-                    borderWidth: 1.5,
-                    fill: true
-                }]
-            },
-            options: {
-                tension: 0.5,
-                responsive: true,
-                scales: {
-                    y: {
-                        suggestedMin: suggestedMin,
-                        suggestedMax: suggestedMax
+            for (var i = 0; i < data.length; i++) {
+              price.push(data[i][4]);
+              time.push(data[i][0]);
+            }
+            // convert time array unix time to human readable time
+            const formattedTime = time.map((timestamp) => {
+              const date = new Date(timestamp);
+              return date.toLocaleString(); // Adjust the formatting as needed
+            });
+            console.log(formattedTime);
+            var ctx = document.getElementById('stockChart').getContext('2d');
+                    // Clamp the minimum and maximum values
+                    var minValue = Math.min(...price);
+                    var maxValue = Math.max(...price);
+                    console.log(minValue);
+                    console.log(maxValue);
+            
+                    // Calculate the range of values
+                    var valueRange = maxValue - minValue;
+            
+                    // Adjust the y-axis scale to fit the clamped range
+                    var suggestedMin = minValue - (valueRange * 0.01); // Adjust the factor (0.1) as needed
+                    var suggestedMax = maxValue + (valueRange * 0.01); // Adjust the factor (0.1) as needed
+                    console.log(suggestedMin);
+                    console.log(suggestedMax);
+            
+                    // Define the gradient colors based on the last value minus the first value
+                    var lastValue = price[price.length - 1];
+                    var firstValue = price[0];
+            
+                    var gradientColorStart;
+                    var gradientColorEnd;
+            
+                    if (lastValue - firstValue > 0) {
+                        gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
+                        gradientColorEnd = 'rgba(46, 204, 113, 1)'; // Green
+                        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
+                        gradientFill.addColorStop(0, gradientColorEnd);
+                        gradientFill.addColorStop(1, gradientColorStart);
+                    } else {
+                        gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
+                        gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
+                        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
+                        gradientFill.addColorStop(0, gradientColorEnd);
+                        gradientFill.addColorStop(1, gradientColorStart);
                     }
-                }
-            },
-            plugins: [{
-                id: 'gradientBg',
-                beforeDraw: (chart, args, options) => {
-                    const ctx = chart.canvas.getContext('2d');
-                    const chartArea = chart.chartArea;
-                    const { top, right, bottom, left, width, height } = chartArea;
-                    const gradient = ctx.createLinearGradient(left, bottom, left, top);
-                    gradient.addColorStop(0, gradientColorStart);
-                    gradient.addColorStop(1, gradientColorEnd);
-                    stockChart.data.datasets[0].backgroundColor = gradient;
-                }
-            }]
-        });
-        function handleResize() {
-            stockChart.resize(); // Resize the chart when the window changes size
+            
+                    // Create the chart
+                    var stockChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: formattedTime,
+                            datasets: [{
+                                label: CryptoName,
+                                data: price,
+                                backgroundColor: gradientFill,
+                                borderColor: 'rgba(25, 25, 25, 1)',
+                                borderWidth: 1.5,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            tension: 0.5,
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    suggestedMin: suggestedMin,
+                                    suggestedMax: suggestedMax
+                                }
+                            }
+                        },
+                        plugins: [{
+                            id: 'gradientBg',
+                            beforeDraw: (chart, args, options) => {
+                                const ctx = chart.canvas.getContext('2d');
+                                const chartArea = chart.chartArea;
+                                const { top, right, bottom, left, width, height } = chartArea;
+                                const gradient = ctx.createLinearGradient(left, bottom, left, top);
+                                gradient.addColorStop(0, gradientColorStart);
+                                gradient.addColorStop(1, gradientColorEnd);
+                                stockChart.data.datasets[0].backgroundColor = gradient;
+                            }
+                        }]
+                    });
+                    function handleResize() {
+                        stockChart.resize(); // Resize the chart when the window changes size
+                    }
+                    // Add event listener for window resize
+                    window.addEventListener('resize', handleResize);
+            } catch (error) {
+                // Handle any errors that occurred during the request
+                console.error('Error:', error);
+            }
         }
-        // Add event listener for window resize
-        window.addEventListener('resize', handleResize);
-
+        // Call the async function to fetch data
+        fetchData();
 
         const exampleModal = document.getElementById('exampleModal')
         if (exampleModal) {
