@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MongoDB.Bson;
 using StockSavvy.Models;
 using StockSavvy.Services;
+using static StockSavvy.Models.CryptoModel;
 
 namespace StockSavvy.Pages
 {
@@ -20,7 +21,13 @@ namespace StockSavvy.Pages
         
         [BindProperty]
         public int Amount { get; set; }
+        [BindProperty]
+        public List<CryptoData> CryptoDataList { get; set; }
         
+        
+        
+        
+
         public CryptoModel(ILogger<CryptoModel> logger)
         {
             _logger = logger;

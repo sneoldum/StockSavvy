@@ -8,7 +8,7 @@
 <h1>Crypto</h1>
 <form asp-page-handler="CryptoRequest" method="post" class="form-floating">
     <input class="" style="width: 30%;" type="search" placeholder="Type stock code (eg. AMZN)"
-           asp-for="CryptoCode" />
+           asp-for="CryptoCode" id="CryptoInput" />
     <button style="background: deepskyblue" class="btn btn-outline-primary">Search</button>
 </form>
 <h3>@Model.Price</h3>
@@ -45,24 +45,154 @@
         </div>
     </div>
     <h1>Satmazsan zararda değilsin!</h1>
+                          <canvas id="stockChart" width="400" height="400"></canvas>
 }
-<script>
-    const exampleModal = document.getElementById('exampleModal')
-            if (exampleModal) {
-                exampleModal.addEventListener('show.bs.modal', event => {
-                    // Button that triggered the modal
-                    const button = event.relatedTarget
-                    // Extract info from data-bs-* attributes
-                    const recipient = button.getAttribute('data-bs-whatever')
-                    // If necessary, you could initiate an Ajax request here
-                    // and then do the updating in a callback.
-    
-                    // Update the modal's content.
-                    const modalTitle = exampleModal.querySelector('.modal-title')
-                    const modalBodyInput = exampleModal.querySelector('.modal-body input')
-    
-                    modalTitle.textContent = `New message to ${recipient}`
-                    modalBodyInput.value = recipient
-                })
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const CryptoName = document.getElementById('CryptoInput').value;
+        console.log(CryptoName);
+        let price = [];
+        let time = [];
+        fetch("https://api.binance.com/api/v3/klines?symbol=" + CryptoName +"USDT&interval=15m&limit=20")
+          .then(response => response.json())
+          .then(data => {
+            for (var i = 0; i < data.length; i++) {
+                price.push(data[i][4]);
+                time.push(data[i][0]);
             }
-</script>
+          })
+          .catch(error => {
+            // Handle any errors that occurred during the request
+            console.error('Error:', error);
+          });
+          console.log(price[0]);
+            console.log(time);
+        
+          
+        var ctx = document.getElementById('stockChart').getContext('2d');
+
+        // Define the desired minimum and maximum values for the y-axis
+        var desiredMinValue = 50; // Replace with your desired minimum value
+        var desiredMaxValue = 200; // Replace with your desired maximum value
+
+        // Clamp the minimum and maximum values
+        var minValue = Math.max(Math.min(...price), desiredMinValue);
+        var maxValue = Math.min(Math.max(...price), desiredMaxValue);
+
+        // Calculate the range of values
+        var valueRange = maxValue - minValue;
+
+        // Adjust the y-axis scale to fit the clamped range
+        var suggestedMin = minValue - (valueRange * 0.01); // Adjust the factor (0.1) as needed
+        var suggestedMax = maxValue + (valueRange * 0.01); // Adjust the factor (0.1) as needed
+
+        // Define the gradient colors based on the last value minus the first value
+        var lastValue = price[price.length - 1];
+        var firstValue = price[0];
+
+        var gradientColorStart;
+        var gradientColorEnd;
+
+        if (lastValue - firstValue > 0) {
+            gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
+            gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
+            var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
+            gradientFill.addColorStop(0, gradientColorEnd);
+            gradientFill.addColorStop(1, gradientColorStart);
+        } else {
+            gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
+            gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
+            var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height * 2);
+            gradientFill.addColorStop(0, gradientColorEnd);
+            gradientFill.addColorStop(1, gradientColorStart);
+        }
+
+        // Create the chart
+        var stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: time,
+                datasets: [{
+                    label: CryptoName,
+                    data: price,
+                    backgroundColor: gradientFill,
+                    borderColor: 'rgba(25, 25, 25, 1)',
+                    borderWidth: 1.5,
+                    fill: true
+                }]
+            },
+            options: {
+                tension: 0.5,
+                responsive: true,
+                scales: {
+                    y: {
+                        suggestedMin: suggestedMin,
+                        suggestedMax: suggestedMax
+                    }
+                }
+            },
+            plugins: [{
+                id: 'gradientBg',
+                beforeDraw: (chart, args, options) => {
+                    const ctx = chart.canvas.getContext('2d');
+                    const chartArea = chart.chartArea;
+                    const { top, right, bottom, left, width, height } = chartArea;
+                    const gradient = ctx.createLinearGradient(left, bottom, left, top);
+                    gradient.addColorStop(0, gradientColorStart);
+                    gradient.addColorStop(1, gradientColorEnd);
+                    stockChart.data.datasets[0].backgroundColor = gradient;
+                }
+            }]
+        });
+        function handleResize() {
+            stockChart.resize(); // Resize the chart when the window changes size
+        }
+        // Add event listener for window resize
+        window.addEventListener('resize', handleResize);
+
+
+        const exampleModal = document.getElementById('exampleModal')
+        if (exampleModal) {
+            exampleModal.addEventListener('show.bs.modal', event => {
+                // Button that triggered the modal
+                const button = event.relatedTarget
+                // Extract info from data-bs-* attributes
+                const recipient = button.getAttribute('data-bs-whatever')
+                // If necessary, you could initiate an Ajax request here
+                // and then do the updating in a callback.
+
+                // Update the modal's content.
+                const modalTitle = exampleModal.querySelector('.modal-title')
+                const modalBodyInput = exampleModal.querySelector('.modal-body input')
+
+                modalTitle.textContent = `New message to ${recipient}`
+                modalBodyInput.value = recipient
+            })
+        }
+    
+    
+    
+    
+    </script>
+    <script>
+        const exampleModal = document.getElementById('exampleModal')
+                if (exampleModal) {
+                    exampleModal.addEventListener('show.bs.modal', event => {
+                        // Button that triggered the modal
+                        const button = event.relatedTarget
+                        // Extract info from data-bs-* attributes
+                        const recipient = button.getAttribute('data-bs-whatever')
+                        // If necessary, you could initiate an Ajax request here
+                        // and then do the updating in a callback.
+        
+                        // Update the modal's content.
+                        const modalTitle = exampleModal.querySelector('.modal-title')
+                        const modalBodyInput = exampleModal.querySelector('.modal-body input')
+        
+                        modalTitle.textContent = `New message to ${recipient}`
+                        modalBodyInput.value = recipient
+                    })
+                }
+    </script>
+}

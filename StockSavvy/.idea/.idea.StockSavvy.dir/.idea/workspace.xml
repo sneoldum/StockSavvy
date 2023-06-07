@@ -20,8 +20,15 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e3bc3f84cc248cc742fc1c5f56a7727d2febed13ab281104470f728796baac5/RazorPage.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "XThreadsFramesViewSplitterKey": "0.33251232",
     "git-widget-placeholder": "feature/portfolio-page",
     "node.js.selected.package.tslint": "(autodetect)"
   }
