@@ -16,9 +16,9 @@ public class UserMongoModel
     [BsonElement("Username")]
     public string Username { get; set; }
     [BsonElement("PasswordSalt")]
-    public string PasswordSalt { get; set; }
+    public byte[] PasswordSalt { get; set; }
     [BsonElement("PasswordHash")]
-    public string PasswordHash { get; set; }
+    public byte[] PasswordHash { get; set; }
     [BsonElement("PortfolioId")]
     [BsonRepresentation(BsonType.ObjectId)]
     //this part should filled when user creates a portfolio. this should be equal to Id field in @PortfolioMongoModel class

@@ -1,123 +1,182 @@
 ﻿@page
 @model StockSavvy.Pages.StockModel
 @{
-    ViewData["Title"] = "Home page";
+ViewData["Title"] = "Home page";
 }
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
 
+<head>
+    <style>
+        .col {
+            display: grid;
+            grid-template-columns: 70% 30%;
+            /* Set the columns width ratio */
+            gap: 10px;
+            /* Add some spacing between the columns */
+        }
+
+        .col-1,
+        .col-2 {
+            background-color: rgba(220, 220, 220, 0.1);
+            ;
+            padding: 10px;
+        }
+    </style>
+</head>
 
 <div class="container">
     <div>
         <form asp-page-handler="StockRequest" method="post" class="form-floating">
-            <input class="" style="width: 44%;" type="search" placeholder="Type stock code (eg. AMZN)" asp-for="StockCode" />
+            <input class="" style="width: 44%;" type="search" placeholder="Type stock code (eg. AMZN)"
+                asp-for="StockCode" />
             <input style="width: 45%;" type="search" placeholder="Enter your Alpha Vantage Api key" asp-for="key" />
             <button style="width: 10%;" class="btn btn-outline-primary">Search</button>
         </form>
-        
+
         @if (Model.dataExJson != null)
         {
-            <h1 class="alert alert-danger" role="alert">@Model.dataExJson</h1>
+        <h1 class="alert alert-danger" role="alert">@Model.dataExJson</h1>
         }
         else if (Model.DataList != null)
         {
-            <div>
-                <h1 style="display: inline">@Model.DataSymbol</h1>
+        <div>
+            <h1 style="display: inline">@Model.DataSymbol</h1>
 
-                @if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) - (Convert.ToDouble(Model.DataOpen.Replace(".", ",")))) > 0)
-                {
-                    <h4 style="display: inline; " class="badge rounded-pill bg-success">
-                        +%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) / (((Convert.ToDouble(Model.DataOpen.Replace(".", ",")))))*100)-100 ,3)) </h4>
-                }
-                else if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) - (Convert.ToDouble(Model.DataOpen.Replace(".", ",")))) == 0)
-                {
-                    <h4 style="display: inline; color: grey" class="badge rounded-pill bg-secondary">%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) / (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3)) </h4>
+            @if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) - (Convert.ToDouble(Model.DataOpen.Replace(".",
+            ",")))) > 0)
+            {
+            <h4 style="display: inline; " class="badge rounded-pill bg-success">
+                +%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                (((Convert.ToDouble(Model.DataOpen.Replace(".", ",")))))*100)-100 ,3)) </h4>
+            }
+            else if (((Convert.ToDouble(Model.DataClose.Replace(".", ","))) -
+            (Convert.ToDouble(Model.DataOpen.Replace(".", ",")))) == 0)
+            {
+            <h4 style="display: inline; color: grey" class="badge rounded-pill bg-secondary">
+                %@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3)) </h4>
 
-                }
-                else
-                {
-                    <h4 style="display: inline; " class="badge rounded-pill bg-danger">-%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) / (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3).ToString().Replace("-",""))</h4>
+            }
+            else
+            {
+            <h4 style="display: inline; " class="badge rounded-pill bg-danger">
+                -%@(System.Math.Round((Convert.ToDouble(Model.DataClose.Replace(".", ",")) /
+                (((Convert.ToDouble(Model.DataOpen.Replace(".", ","))))) * 100) - 100, 3).ToString().Replace("-",""))
+            </h4>
 
-                }
+            }
 
 
+        </div>
+
+        <div class="col">
+            <div class="col-1">
+                <h6>@Model.DataLast</h6>
+                <canvas id="stockChart"></canvas>
             </div>
-            <div class="row">
-                <div class="col-8">
-
-                    <h6>@Model.DataLast</h6>
-                    <table style="height: 500px; object-fit: cover; " id="line-example-12" class="charts-css line multiple hide-data show-labels show-primary-axis show-4-secondary-axes">
-                        <caption> Stock Chart </caption>
-
-                        @if (Model.DataList != null)
-                        {
-
-                            int i = 0;
-                            <tbody>
-                                @foreach (var data in Model.DataList)
-                                {
-
-                                    if (i < 10)
-                                    {
-                                        <tr style="">
-                                            <th scope="row"> @Model.Date[i] </th>
-                                            <td style="--start: calc(@data.Open/250); --size: calc(@data.Close/250);"><span class="data"> @data.Close </span></td>
-                                            <td style="--start: calc(@data.Close/250); --size: calc(@Model.DataList[i + 1].Open/250); "><span class="data"> @data.Close </span></td>
-
-                                        </tr>
-                                        @* <tr>
-                        <th scope="row"> @Model.Date[i+1] </th>
-                        </tr>*@
-                                        i++;
-                                        i++;
-                                    }
-                                }
-                            </tbody>
-
-                        }
-                    </table>
-
-
-
-
-                </div>
-                <div class="col-4">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Update date</th>
-                                <th scope="col">Open</th>
-                                <th scope="col">Close</th>
-                                <th scope="col">Volume</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            @if (Model.DataList != null)
-                            {
-                                int i = 1;
-                                @foreach (var data in Model.DataList)
-                                {
-
-                                    <tr>
-                                        <td>@Model.Date[i-1]</td>
-                                        <td>@data.Open</td>
-                                        <td>@data.Close</td>
-                                        <td>@data.Volume</td>
-
-                                    </tr>
-                                    i++;
-                                }
-                            }
-                        </tbody>
-                    </table>
-
-                </div>
+            <div class="col-2">
+                <h6>Open</h6>
+                <h6>@Model.DataOpen</h6>
+                <h6>High</h6>
+                <h6>@Model.DataHigh</h6>
+                <h6>Low</h6>
+                <h6>@Model.DataLow</h6>
+                <h6>Close</h6>
+                <h6>@Model.DataClose</h6>
+                <h6>Volume</h6>
+                <h6>@Model.DataVolume</h6>
             </div>
-
-
-
+        </div>
         }
-
     </div>
 </div>
 
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const dataList = @Json.Serialize(Model.DataList);
+    const labels = @Json.Serialize(Model.Date);
+    const stockName = @Json.Serialize(Model.DataSymbol);
+    console.log(dataList);
+    console.log(labels);
+    var ctx = document.getElementById('stockChart').getContext('2d');
+
+    // Extract the necessary data from the dataList and dateList
+    var stockPrices = dataList.map(data => parseFloat(data['4. close']));
+    stockPrices.reverse();
+    labels.reverse();
+    // Define the desired minimum and maximum values for the y-axis
+    var desiredMinValue = 50; // Replace with your desired minimum value
+    var desiredMaxValue = 200; // Replace with your desired maximum value
+
+    // Clamp the minimum and maximum values
+    var minValue = Math.max(Math.min(...stockPrices), desiredMinValue);
+    var maxValue = Math.min(Math.max(...stockPrices), desiredMaxValue);
+
+    // Calculate the range of values
+    var valueRange = maxValue - minValue;
+
+    // Adjust the y-axis scale to fit the clamped range
+    var suggestedMin = minValue - (valueRange * 0.01); // Adjust the factor (0.1) as needed
+    var suggestedMax = maxValue + (valueRange * 0.01); // Adjust the factor (0.1) as needed
+
+    // Define the gradient colors based on the last value minus the first value
+    var lastValue = stockPrices[stockPrices.length - 1];
+    var firstValue = stockPrices[0];
+
+    var gradientColorStart;
+    var gradientColorEnd;
+    
+    if (lastValue - firstValue > 0) {
+        gradientColorStart = 'rgba(46, 204, 113, 0)'; // Transparent Green
+        gradientColorEnd = 'rgba(46, 204, 113, 0.75)'; // Green
+        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
+        gradientFill.addColorStop(0, gradientColorEnd);
+        gradientFill.addColorStop(1, gradientColorStart);
+    } else {
+        gradientColorStart = 'rgba(255, 50, 50, 0.75)'; // Red
+        gradientColorEnd = 'rgba(255, 50, 50, 0)'; // Transparent Red
+        var gradientFill = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height*2);
+        gradientFill.addColorStop(0, gradientColorEnd);
+        gradientFill.addColorStop(1, gradientColorStart);
+    }
+    
+    // Create the chart
+    var stockChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: stockName,
+                data: stockPrices,
+                backgroundColor: gradientFill,
+                borderColor: 'rgba(25, 25, 25, 1)',
+                borderWidth: 1.5,
+                fill: true
+            }]
+        },
+        options: {
+            tension: 0.5,
+            responsive: true,
+            scales: {
+                y: {
+                    suggestedMin: suggestedMin,
+                    suggestedMax: suggestedMax
+                }
+            }
+        },
+        plugins: [{
+            id: 'gradientBg',
+            beforeDraw: (chart, args, options) => {
+                const ctx = chart.canvas.getContext('2d');
+                const chartArea = chart.chartArea;
+                const { top, right, bottom, left, width, height } = chartArea;
+                const gradient = ctx.createLinearGradient(left, bottom, left, top);
+                gradient.addColorStop(0, gradientColorStart);
+                gradient.addColorStop(1, gradientColorEnd);
+                stockChart.data.datasets[0].backgroundColor = gradient;
+            }
+        }]
+    });
+</script>
+}
