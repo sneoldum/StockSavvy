@@ -77,12 +77,12 @@ namespace StockSavvy.Pages
         }
 
 
-        public decimal GetCyrptoPrice(string CryptoCode)
+        public float GetCyrptoPrice(string CryptoCode)
         {
             StockService stockService = new StockService();
             var stockModel = stockService.GetCryptoModel(CryptoCode);
             var oldPrice = stockModel.price.Replace(".", ",");
-            if (decimal.TryParse(oldPrice, out decimal price))
+            if (float.TryParse(oldPrice, out float price))
             {
                 StockPriceModel stockPrice = new StockPriceModel();
                 stockPrice.StockCode = CryptoCode;

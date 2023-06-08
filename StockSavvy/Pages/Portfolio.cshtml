@@ -5,7 +5,6 @@
 <html>
 <head>
     <title>Stock Portfolio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
@@ -35,101 +34,121 @@
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="portfolio-container">
-                <h3>Stock Portfolio</h3>
-                @foreach (var stock in Model.stocks)
-                {
-                    <div class="stock-item">
-                        <span class="stock-code">@stock.StockCode.ToUpper()</span>
-                        <span class="ml-auto">$@((stock.Amount * stock.AverageCost).ToString("##.##"))</span>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="portfolio-container" style="height: 400px; margin-bottom: 10px; overflow: auto;">
+                    <h3>Portfolio</h3>
+                    <table class="table table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Amount</th>
+                                <th>Average Cost</th>
+                                <th>Market Price</th>
+                                <th>Market Cap</th>
+                                <th>Net Income %</th>
+                            </tr>
+                        </thead>
+                        @foreach (var stock in Model.stocks)
+                        {
+                            <tbody>
+                                <tr>
+                                    <td>@stock.StockCode</td>
+                                    <td>@stock.Amount</td>
+                                    <td>@((stock.AverageCost).ToString("###.#####"))</td>
+                                    <td>@Model.GetCyrptoPrice(stock.StockCode)</td>
+                                    <td>@(System.Math.Round((Model.GetCyrptoPrice(stock.StockCode) * stock.Amount), 1))</td>
+                                    <td>
+                                        @(System.Math.Round((((Model.GetCyrptoPrice(stock.StockCode) * 100) / (stock.AverageCost)) - 100), 2))
+                                    </td>
+                                </tr>
+                            </tbody>
+                        }
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6" style="">
+                <div class="portfolio-container" style="height: 400px; margin-bottom: 10px;">
+                    <canvas id="donut-chart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="chart-container">
+                    <div class="portfolio-container">
+                        @foreach (var stock in Model.stocks)
+                        {
+                            Console.WriteLine(Model.GetCyrptoPrice(stock.StockCode));
+                        }
+                        <canvas id="earnings-chart"></canvas>
                     </div>
-                }
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="portfolio-container">
-                <canvas id="donut-chart"></canvas>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="chart-container">
-                <div class="portfolio-container">
-                    @foreach (var stock in Model.stocks)
-                    {
-                        Console.WriteLine(Model.GetCyrptoPrice(stock.StockCode));
-                    }
-                    <canvas id="earnings-chart"></canvas>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 </html>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    var palette = ['#F66D44', '#E6F69D', '#8d81b2', '#AADEA7', '#d44848', '#2D87BB',  '#9d725e', '#5ec6ec', '#86a4a6', '#64C2A6', '#FEAE65', '#ef8cdd'];
-    var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
-    //this is a sample for using data: var stockPrices = dataList.map(data => parseFloat(data['4. close']));
-    var stockData = portfolioData.map(stock => ({
-        symbol: stock['stockCode'].toUpperCase(),
-        value: stock['amount'] * stock['averageCost'],
-        averageCost: stock['averageCost'],
-        amount: stock['amount']
-    }));
-    
-    var donutChart = new Chart(document.getElementById('donut-chart'), {
-        type: 'doughnut',
-        data: {
-            labels: stockData.map(stock => stock.symbol),
-            usePointStyle: true,
-            datasets: [{
-                data: stockData.map(stock => stock.value),
-                backgroundColor: palette.slice(0, stockData.length),
-                borderRadius: 10
-            }],
-        },
-        options: {
-            animation: {
-                animateScale: true, // Add animation to scale the chart
-                animateRotate: true // Add animation to rotate the chart
+        var palette = ['#F66D44', '#E6F69D', '#8d81b2', '#AADEA7', '#d44848', '#2D87BB', '#9d725e', '#5ec6ec', '#86a4a6', '#64C2A6', '#FEAE65', '#ef8cdd'];
+        var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
+        //this is a sample for using data: var stockPrices = dataList.map(data => parseFloat(data['4. close']));
+        var stockData = portfolioData.map(stock => ({
+            symbol: stock['stockCode'].toUpperCase(),
+            value: stock['amount'] * stock['averageCost'],
+            averageCost: stock['averageCost'],
+            amount: stock['amount']
+        }));
+
+        var donutChart = new Chart(document.getElementById('donut-chart'), {
+            type: 'doughnut',
+            data: {
+                labels: stockData.map(stock => stock.symbol),
+                usePointStyle: true,
+                datasets: [{
+                    data: stockData.map(stock => stock.value),
+                    backgroundColor: palette.slice(0, stockData.length),
+                    borderRadius: 10
+                }],
             },
-            responsive: true,
-            cutout: '80%',
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 10,
-                        boxWidth: 3
+            options: {
+                animation: {
+                    animateScale: true, // Add animation to scale the chart
+                    animateRotate: true // Add animation to rotate the chart
+                },
+                responsive: true,
+                cutout: '80%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 10,
+                            boxWidth: 3
+                        }
                     }
-                }
-            },
-            tooltips: {
-                callbacks: {
-                    label: function (tooltipItem, data) {
-                        var dataset = data.datasets[tooltipItem.datasetIndex];
-                        var index = tooltipItem.index;
-                        var value = dataset.data[index];
-                        var symbol = data.labels[index];
-                        return symbol + ": $" + value + "";
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            var dataset = data.datasets[tooltipItem.datasetIndex];
+                            var index = tooltipItem.index;
+                            var value = dataset.data[index];
+                            var symbol = data.labels[index];
+                            return symbol + ": $" + value + "";
+                        }
                     }
                 }
             }
+        });
+        function handleResize() {
+            donutChart.resize(); // Resize the chart when the window changes size
         }
-    });
-    function handleResize() {
-        donutChart.resize(); // Resize the chart when the window changes size
-    }
-    // Add event listener for window resize
-    window.addEventListener('resize', handleResize);
-</script>
+        // Add event listener for window resize
+        window.addEventListener('resize', handleResize);
+    </script>
     <script>
         var portfolioData = @Html.Raw(Json.Serialize(Model.stocks));
         var prices = @Html.Raw(Json.Serialize(Model.prices));
@@ -143,7 +162,7 @@
             symbol: price['stockCode'].toUpperCase(),
             price: price['price']
         }));
-        
+
         // get earnings stockPrices.price minus stockData.averageCost multiplied by stockData.amount compare with symbol
         var earnings = stockData.map(stock => {
             var matchingPrice = stockPrices.find(price => price.symbol === stock.symbol);
@@ -153,11 +172,11 @@
                 value: earningsValue
             };
         });
-        
-            
+
+
         // Calculate total earnings
         const totalEarnings = earnings.reduce((total, stock) => total + stock.value, 0);
-        
+
         // Clamp the minimum and maximum values
         const minValue = Math.min(Math.min(...earnings.map(stock => stock.value), totalEarnings));
         const maxValue = Math.max(Math.max(...earnings.map(stock => stock.value), totalEarnings));
@@ -165,7 +184,7 @@
         // Calculate the suggested minimum and maximum values
         var SuggestedMin = minValue * 1.1;
         var SuggestedMax = maxValue * 1.1;
-        
+
 
         // Create the chart
         const ctx = document.getElementById('earnings-chart').getContext('2d');
@@ -174,7 +193,7 @@
             data: {
                 labels: ['Total Earnings', ...earnings.map(stock => stock.symbol)],
                 datasets: [{
-                    label: 'Stock Earnings',
+                    label: 'Earnings',
                     data: [totalEarnings, ...earnings.map(stock => stock.value)],
                     backgroundColor: [totalEarnings < 0 ? 'rgba(255, 100, 100, 0.70)' : 'rgba(100, 255, 100, 0.7)', ...earnings.map(earnings => earnings.value < 0 ? 'rgba(255, 100, 100, 0.7)' : 'rgba(100, 255, 100, 0.7)')],
                     borderWidth: 2,
@@ -201,6 +220,6 @@
         }
         // Add event listener for window resize
         window.addEventListener('resize', handleResize);
-    
+
     </script>
 }
