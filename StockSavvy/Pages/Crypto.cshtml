@@ -4,14 +4,13 @@
     ViewData["Title"] = "Crypto";
 }
 <div style="margin-top: 5%">
-    <form asp-page-handler="CryptoRequest" method="post" class="form-floating">
-        <input class="" style="width: 100%;" type="search" placeholder="Type stock code (eg. BTC)"
+    <form asp-page-handler="CryptoRequest" method="post" class="form-floating" style="display: flex">
+        <input class="" style="width: 75%;" type="search" placeholder="Type stock code (eg. BTC)"
                asp-for="CryptoCode" id="CryptoInput" />
-        <button style="width: 49%; border-radius: 7px;" class="btn btn-outline-primary">Search</button>
+        <button style="width: 25%; border-radius: 7px;" class="btn btn-primary">Search</button>
     </form>
     <div class="row">
-        <div class="col-8">
-            <h1>Satmazsan zararda değilsin!</h1>
+        <div class="col-8" style="margin-top: 3%">
             <canvas id="stockChart" width="400" height="200"></canvas>
         </div>
         <div class="col-4" style="margin-top: 7%">
