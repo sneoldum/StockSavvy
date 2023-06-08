@@ -51,7 +51,7 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const CryptoName = document.getElementById('CryptoInput').value;
+        const CryptoName = document.getElementById('CryptoInput').value.toUpperCase();
         console.log(CryptoName);
         let price = [];
         let time = [];

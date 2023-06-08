@@ -50,7 +50,7 @@ namespace StockSavvy.Pages
 
         public void OnPostCryptoRequest(StockService stockService)
         {
-            var stockModel = stockService.GetCryptoModel(CryptoCode);
+            var stockModel = stockService.GetCryptoModel(CryptoCode.ToUpper());
 
             Price = stockModel.price;
 
