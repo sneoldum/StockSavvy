@@ -114,6 +114,14 @@ namespace StockSavvy.Pages
                 DataVolume = firstOrDefaultValue.Volume;
             }
         }
+
+        public void OnPostCryptoRequest(StockService stockService)
+        {
+            var stockModel = stockService.GetCryptoModel(StockCode);
+            
+            DataClose = stockModel.price;
+
+        }
         public IActionResult OnPostBuyRequest(PortfolioService portfolioService, StockService stockService)
         {
             var userName = Request.Cookies["username"];

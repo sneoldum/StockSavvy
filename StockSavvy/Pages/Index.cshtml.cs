@@ -67,7 +67,7 @@ namespace StockSavvy.Pages
 
                             Response.Cookies.Append("username", UserName, options);
 
-                            return RedirectToPage("/Home");
+                            return RedirectToPage("/Crypto");
                         }
                         else
                         {

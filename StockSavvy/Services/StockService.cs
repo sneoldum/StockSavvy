@@ -38,6 +38,20 @@ namespace StockSavvy.Services
             Console.WriteLine(stockData.Datas);
             return stockData;
         }
+        
+        public CryptoModel? GetCryptoModel(string crypto)
+        {
+            if (crypto == null)
+            {
+                crypto = "ETH";
+            }
+            string url = string.Concat("https://api.binance.com/api/v3/ticker/price?symbol="+crypto+"USDT");
+            //string url = string.Concat("https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=" + stockCode+"&apikey=", apikey);
+
+            var json = new WebClient().DownloadString(url);
+            CryptoModel? cryptoData = JsonSerializer.Deserialize<CryptoModel>(json);
+            return cryptoData;
+        }
 
         //returns all of the Stocks from db
         public List<StockMongoModel> Get()
