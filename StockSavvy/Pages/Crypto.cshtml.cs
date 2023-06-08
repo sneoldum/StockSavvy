@@ -108,6 +108,7 @@ namespace StockSavvy.Pages
         }
         public void OnGet()
         {
+            CryptoCode = "BTC";
         }
     }
 }

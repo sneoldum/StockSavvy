@@ -3,8 +3,6 @@
 @{
     ViewData["Title"] = "Home page";
 }
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
 <head>
     <style>
         button {
@@ -87,54 +85,34 @@
                     <h6>@Model.DataLast</h6>
                     <canvas id="stockChart"></canvas>
                 </div>
-                <div>
-                    <h6>Open</h6>
-                    <h6>@Model.DataOpen</h6>
-                    <h6>High</h6>
-                    <h6>@Model.DataHigh</h6>
-                    <h6>Low</h6>
-                    <h6>@Model.DataLow</h6>
-                    <h6>Close</h6>
-                    <h6>@Model.DataClose</h6>
-                    <h6>Volume</h6>
-                    <h6>@Model.DataVolume</h6>
-                    <form asp-page-handler="BuyRequest" method="post">
-                        <button style="background: green">Buy</button>
-                    </form>
-                    <form asp-page-handler="SellRequest" method="post">
-                        <button style="background: red" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Sell</button>
-                    </form>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@@mdo">Buy or sell</button>
+                <div style="height: 400px; overflow: auto">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Update date</th>
+                            <th scope="col">Open</th>
+                            <th scope="col">Close</th>
+                        </tr>
+                        </thead>
+                        <tbody>
 
-                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
+                        @if (Model.DataList != null)
+                        {
+                            int i = 1;
+                            @foreach (var data in Model.DataList)
+                            {
 
-                                </div>
-                                <div class="modal-body">
-                                   
-                                </div>
-                                <div class="modal-footer">
-                                    <form asp-page-handler="BuyRequest" method="post">
-                                        <input value="@Model.StockCode.ToUpper()" asp-for="StockCode" ></input>
-                                        <input value="@Model.DataClose" asp-for="DataClose" style="display: none"></input>
-
-                                        <input type="number" class="form-control" id="recipient-name" placeholder="Amount buy" asp-for="Amount">
-                                        <button style="background: green">Buy</button>
-                                    </form>
-                                    <form asp-page-handler="SellRequest" method="post">
-                                        <input type="number" class="form-control" id="recipient-name" placeholder="Amount sell" asp-for="Amount">
-                                        <input value="@Model.StockCode.ToUpper()" asp-for="StockCode"></input>
-                                        <input value="@Model.DataClose" asp-for="DataClose" style="display: none"></input>
-
-
-                                        <button style="background: red" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Sell</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                <tr>
+                                    <td>@Model.Date[i-1]</td>
+                                    <td>@data.Open</td>
+                                    <td>@data.Close</td>
+                                </tr>
+                                i++;
+                            }
+                        }
+                        </tbody>
+                    </table>
+                    
                 </div>
             </div>
         }
