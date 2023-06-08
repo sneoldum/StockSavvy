@@ -59,7 +59,7 @@ namespace StockSavvy.Pages
         public IActionResult OnPostBuyRequest(PortfolioService portfolioService, StockService stockService)
         {
             var userName = Request.Cookies["username"];
-            var dataClose = Convert.ToDouble(Price.Replace(".", ","));
+            var dataClose = Convert.ToDouble(Price);
             var UserService = new UserService();
             var user = UserService.GetOneByUsername(userName);
 
@@ -109,7 +109,7 @@ namespace StockSavvy.Pages
         public IActionResult OnPostSellRequest(PortfolioService portfolioService, StockService stockService)
         {
             var userName = Request.Cookies["username"];
-            var dataClose = Convert.ToDouble(Price.Replace(".", ","));
+            var dataClose = Convert.ToDouble(Price);
 
             var UserService = new UserService();
             var user = UserService.GetOneByUsername(userName);
