@@ -81,7 +81,7 @@ namespace StockSavvy.Pages
         {
             StockService stockService = new StockService();
             var stockModel = stockService.GetCryptoModel(CryptoCode);
-            var oldPrice = stockModel.price.Replace(".", ",");
+            var oldPrice = stockModel.price;
             if (float.TryParse(oldPrice, out float price))
             {
                 StockPriceModel stockPrice = new StockPriceModel();
