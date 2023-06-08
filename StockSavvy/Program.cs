@@ -44,7 +44,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizePage("/Home");
     options.Conventions.AuthorizePage("/Stock");
     options.Conventions.AuthorizePage("/Portfolio");
-    options.Conventions.AuthorizePage("/Privacy");
+    options.Conventions.AuthorizePage("/Crypto");
     options.Conventions.AuthorizeFolder("/Pages");
 });
 
